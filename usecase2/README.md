@@ -272,9 +272,9 @@ Limited by time and budget, the case study didn't dive deeper to achieve the hig
 
 ## Resources
 - Code repository:
-    https://github.com/kaloollylilly/BlackFriday_casestudy.git
-    
+    https://github.com/intelia-agility/mlspecialisation/tree/usecase2/usecase2.git
 - GCP project: blackfridayintelia
+- Data source: gs://blackfriday_data/train.csv
 - Vertex pipeline: https://console.cloud.google.com/vertex-ai/locations/us-central1/pipelines/runs/blackfriday-pipeline-v0-20231101052843?project=blackfridayintelia&supportedpurview=project
 - Deployed models:
     - DNN model: https://console.cloud.google.com/vertex-ai/locations/us-central1/models/2955405891601432576/versions/1?project=blackfridayintelia&supportedpurview=project
