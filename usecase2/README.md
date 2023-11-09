@@ -192,6 +192,10 @@ When running on the notebook, the Deep Learning model achieved scaled RMSE of 0.
 ## Model Training
     Note: The following analysis can be found in the 05-KFP_Pipeline.ipynb.
 
+The best performing model is the DNN model trained using FastAI collab_learner. In order to control overfiting, the original data has been slipped into 75% as train set and 25% as test set. The model will be trained on the training set and eveluated using scaled RMSE and original RMSE on the test set. Unlike many other deep learning frameworks that use fixed learning rate or decreasing learning rate, FastAI uses cyclic learning rate to make the model training converge faster.
+
+We have a contraint to minimize the training cost, therefor, we didn't use GPU. The DNN model training took 10 minutes to fit. For reducing the cost, we used a simpified version of grid search to optimise the DNN performance: we ran several experiments to select the best performing model by changine the most important hyperparameter -- n_factors, which is the size of the depth of the DNN fully-connected layer. We found that the optimal number was 160. 
+
 The deployed XGB model training is in the train_xgb component:
 
 <img src="./images/train_xgb.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
