@@ -196,6 +196,8 @@ The best performing model is the DNN model trained using FastAI collab_learner. 
 
 We have a contraint to minimize the training cost, therefor, we didn't use GPU. The DNN model training took 10 minutes to fit. For reducing the cost, we used a simpified version of grid search to optimise the DNN performance: we ran several experiments to select the best performing model by changine the most important hyperparameter -- n_factors, which is the size of the depth of the DNN fully-connected layer. We found that the optimal number was 160. 
 
+To make sure the result is reproducible, we set the random_seed before model training.
+
 The deployed XGB model training is in the train_xgb component:
 
 <img src="./images/train_xgb.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
