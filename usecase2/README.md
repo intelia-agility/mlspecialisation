@@ -2,7 +2,7 @@
 
 # Table of Content
 - Problem Statement
-- Goal Analysis
+- Requirement Analysis
 - Data Analysis
 - Feature Engineering
 - Data Preprocessing
@@ -23,7 +23,7 @@ The requirements for the Black Friday case study was:
 
 The Black Friday Kaggle dataset, which is six years old, has been downloaded over 32,000 times and analyzed publicly in over 100 notebooks and articles. Although the Kaggle Black Friday Prediction dataset is popular, its purpose is unclear and there is no data dictionary to explain the data in detail. Before we can do any further analysis, we need to understand the dataset's goal, how it was prepared, and why it was designed in a particular way. This information is essential for feature engineering, model selection, and evaluation downstream. In real-world machine learning projects, this preliminary analysis is also important because the best machine learning solutions can only be built on a deep understanding of the data.
 
-## Goal Analysis
+## Requirement Analysis
     Note: The following analysis can be found in the 01-EDA.ipynb.
 
 The first step is to understand what kinds of analysis the dataset allows us to achieve. By comparing the training and test sets, it is clear that all users and products in the test set are also in the training set, the the combination of user and product in the test set has no intersection with the same combination of the train set. 
@@ -32,9 +32,9 @@ The first step is to understand what kinds of analysis the dataset allows us to 
 
 The goal is to use users' past purchases to predict how likely they are to buy other products. To achieve this, we need to build a recommendation system instead of a regular regression model. The interaction between the user and the product is the most important feature for learning personalized patterns. This is the key difference between our solution and most other Black Friday prediction analyses, which treat the task as a regression problem.
 
-The main problem with regression solutions for Black Friday prediction is that they need to treat all users and all products as categories in order to learn user-product interaction patterns well. However, this can lead to the high-dimensionality curse, since users and products are high-cardinality features. As a result, all regression-based Black Friday prediction analyses either have to drop the Product_ID feature or bin it, which prevents them from learning personalized purchasing behaviors.
+The main problem with regression solutions for Black Friday prediction is that they need to treat all users and all products as categories in order to learn user-product interaction patterns well. However, this can lead to the high-dimensionality curse, since users and products are high-cardinality features. As a result, all regression-based Black Friday prediction analyses either have to drop the Product_ID feature, User_ID, or both of them, which make the models unable to learn personalized purchasing behavior.
 
-This case study will show how to use recommender solutions to solve the problem of Black Friday prediction, and how to use regression technology correctly.
+In this case study we will show how to implement personalised prediction useing regression technology, and how to use recommendation solutions to provide supior result. We will demonstrate that based on accurate business understanding, both of the solutions produce much better performance than all open models.
 
 ## Data Analysis
     Note: The following analysis can be found in the 01-EDA.ipynb.
