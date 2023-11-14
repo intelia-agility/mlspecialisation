@@ -26,8 +26,8 @@ Despite the popularity of the Kaggle Black Friday Prediction dataset, many open 
 - [Resources](#Resources)
     - [Evaluation Criteria](#Evaluation-Criteria)
     - [3.2.1.1 Code repository](#3.2.1.1-Code-repository)
-    - [3.2.2.1 Dataset in Google Cloud](#3.2.2.1-Dataset-in-Google-Cloud)
     - [3.2.1.2 Code origin certification](#3.2.1.2-Code-origin-certification)
+    - [3.2.2.1 Dataset in Google Cloud](#3.2.2.1-Dataset-in-Google-Cloud)
     - [3.2.4.1 Model/ application on Google Cloud](#3.2.4.1-Model-or-application-on-Google-Cloud)
     - [3.2.4.2 Callable library/ application](#3.2.4.2-Callable-library-or-application)
     - [3.2.4.3 Editable Model/ application](#3.2.4.3-Editable-Model-or-application)
@@ -315,12 +315,12 @@ Limited by time and budget, the case study didn't dive deeper to achieve the hig
 ### 3.2.1.1 Code repository
     https://github.com/intelia-agility/mlspecialisation/tree/usecase2/usecase2.git
 
+### 3.2.1.2 Code origin certification
+We Intelia confirm that all code of this case study is original and developed within our organization
+
 ### 3.2.2.1 Dataset in Google Cloud
 - GCP project: blackfridayintelia
 - Data source: gs://blackfriday_data/train.csv
-
-### 3.2.1.2 Code origin certification
-We Intelia confirm that all code of this case study is original and developed within our organization
 
 ### 3.2.4.1 Model or application on Google Cloud
 - Vertex pipeline: https://console.cloud.google.com/vertex-ai/locations/us-central1/pipelines/runs/blackfriday-pipeline-v0-20231101052843?project=blackfridayintelia&supportedpurview=project
