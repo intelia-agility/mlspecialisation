@@ -1,30 +1,38 @@
 # Black Friday Case Study
 
-# Black Friday Sales Prediction Requireme
-# Table of Content
-- Problem Statement
-- Requirement Analysis
-- Data Analysis
-- Feature Engineering
-- Data Preprocessing
-- Model Selection
-   - Regressional Solutions
-   - Recommendation Solutions
-- Model Training
-- Model Evaluation
-- Fairness Analaysis
-- Model Deployment
-- Conclusion
-- Resources
-
-## Problem Statement
 The requirements for the Black Friday case study was:
 
     Example of an end-to-end machine learning pipeline using the Black Friday dataset to increase profits. This demo can be implemented using either Vertex AI (or Endpoints) or Dataproc, and can utilize any available machine learning library on Google Cloud (for example, XGBoost, scikit-learn, tf.Keras, Spark machine learning).
 
-The Black Friday Kaggle dataset, which is six years old, has been downloaded over 32,000 times and analyzed publicly in over 100 notebooks and articles. Although the Kaggle Black Friday Prediction dataset is popular, its purpose is unclear and there is no data dictionary to explain the data in detail. Before we can do any further analysis, we need to understand the dataset's goal, how it was prepared, and why it was designed in a particular way. This information is essential for feature engineering, model selection, and evaluation downstream. In real-world machine learning projects, this preliminary analysis is also important because the best machine learning solutions can only be built on a deep understanding of the data.
+The Black Friday Kaggle dataset is a six-year-old dataset with over 31,000 downloads and 100 publicly available notebooks and articles. It remains popular and actively used.
 
-## Requirement Analysis
+<img src="./images/kaggle_BF.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
+
+Despite the popularity of the Kaggle Black Friday Prediction dataset, many open analyses did not sufficiently consider the business requirements, resulting in mostly underperforming outcomes. In our case study, we discovered that the dataset's purpose is to generate personalized predictions for individual users and individual products, rather than a generic regression task. Based on our understanding of the business, we developed both a personalized prediction regression model and a recommendation system. We demonstrated that by properly comprehending the business requirements, we can produce high-quality work in feature engineering, model selection, and evaluation. Finally, we demonstrated our model development process on Vertex AI.
+
+# Table of Content
+- [3.2.3.1 Business goal and machine learning solution](#3.2.3.1-Business-goal-and-machine-learning-solution)
+- [3.2.3.2 Data exploration](#3.2.3.2-Data-exploration)
+- [3.2.3.3 Feature engineering](#3.2.3.3-Feature-engineering)
+- [3.2.3.4 Preprocessing and the data pipeline](#3.2.3.4-Preprocessing-and-the-data-pipeline)
+- [3.2.3.5 Machine learning model design(s) and selection](#3.2.3.5-Machine-learning-model-designs-and-selection)
+   - Regressional Solutions
+   - Recommendation Solutions
+- [3.2.3.6 Machine learning model training and development](#3.2.3.6-Machine-learning-model-training-and-development)
+- [3.2.3.7 Machine learning model evaluation](#3.2.3.7-Machine-learning-model-evaluation)
+- [3.2.3.8 Fairness analysis](#3.2.3.8-Fairness-analysis)
+- Model Deployment
+- Conclusion
+- [Resources](#Resources)
+    - [Evaluation Criteria](#Evaluation-Criteria)
+    - [3.2.1.1 Code repository](#3.2.1.1-Code-repository)
+    - [3.2.2.1 Dataset in Google Cloud](#3.2.2.1-Dataset-in-Google-Cloud)
+    - [3.2.1.2 Code origin certification](#3.2.1.2-Code-origin-certification)
+    - [3.2.4.1 Model/ application on Google Cloud](#3.2.4.1-Model-or-application-on-Google-Cloud)
+    - [3.2.4.2 Callable library/ application](#3.2.4.2-Callable-library-or-application)
+    - [3.2.4.3 Editable Model/ application](#3.2.4.3-Editable-Model-or-application)
+
+## 3.2.3.1 Business goal and machine learning solution
     Note: The following analysis can be found in the 01-EDA.ipynb.
 
 The first step is to understand what kinds of analysis the dataset allows us to achieve. By comparing the training and test sets, it is clear that all users and products in the test set are also in the training set, the the combination of user and product in the test set has no intersection with the same combination of the train set. 
@@ -33,14 +41,20 @@ The first step is to understand what kinds of analysis the dataset allows us to 
 
 The goal is to use users' past purchases to predict how likely they are to buy other products. To achieve this, we need to build a recommendation system instead of a regular regression model. The interaction between the user and the product is the most important feature for learning personalized patterns. This is the key difference between our solution and most other Black Friday prediction analyses, which treat the task as a regression problem.
 
-The main problem with regression solutions for Black Friday prediction is that they need to treat all users and all products as categories in order to learn user-product interaction patterns well. However, this can lead to the high-dimensionality curse, since users and products are high-cardinality features. As a result, all regression-based Black Friday prediction analyses either have to drop the Product_ID feature, User_ID, or both of them, which make the models unable to learn personalized purchasing behavior.
+The difference between regression and personalization is that while regression models learn global patterns, personalization models learn the interactions between users and products. Regular regression models can still learn the interactions when the data size is small. The real problem becomes significant when the data size gets larger.
+
+In order for the model to learn about personalized interactions, both the user and the product features must be treated as categorical features. In most cases, both of them have large numbers of levels. In our case of Black Friday Prediction, there are 5891 users and 3623 products. This is already a very tiny dataset, but it is already out of the comfort zone for regular regression models.
+
+The standard method for regression models to deal with categorical features is one-hot encoding, or putting each categorical level as a new column. However, that technique doesn’t work for the personalization task because 5891 x 3623 will produce a very large and very sparse 2D array. The number of cells in the array is much greater than the number of rows in the dataset. The resulting array is so sparse that the majority of the cells would be empty. This makes the computation very challenging, and more importantly, the general regression models couldn’t learn anything from the array because of the curse of the high dimensionality.
+
+To avoid the high-cardinality dimension problem, all the open analyses either dropped the product column, the user column, or both. With the product and user columns dropped, the models unable to learn personalized purchasing behavior.
 
 In this case study we will show how to implement personalised prediction useing regression technology, and how to use recommendation solutions to provide supior result. We will demonstrate that based on accurate business understanding, both of the solutions produce much better performance than all open models.
 
-## Data Analysis
+## 3.2.3.2 Data exploration
     Note: The following analysis can be found in the 01-EDA.ipynb.
     
-The univariate analysis and bivariate analysis was done by using the framework ydata-profiling that can automatically generate profiling reports. The basic information of the dataset are:
+The univariate analysis and bivariate analysis was done by using the framework ydata-profiling that can automatically generate profiling reports. We use manual plotting to analyse three-ways and four-ways feature interactions. The basic information of the dataset are:
 
 1. There are 550 thousands rows and 12 columns. Some of the features are presented as numerical data type. There are 5891 unique users and 3631 unique products. 
 <p float="left">
@@ -94,22 +108,23 @@ and Kurtosis -0.33837756558517285
 <img src="./images/pd7.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 </p>
 
-## Feature Engineering
+## 3.2.3.3 Feature engineering
     Note: The following analysis can be found in the 01-EDA.ipynb.
 Based on the explorative data analysis, we found that:
 1. Despite that the product_category_1, product_category_2, product_category_3, user_id, occupation and marital_status are all numerical, they are more likely to be categorical features instead. In the following feature processing, we will cast all data features as categorical. 
-2. The product_category_2 and product_category_3 have quite a few missing values. Especially the product_category_3 has a very high missing value rate. Considering the triangual patterns between product_category_1 vs. product_category_2, and product_category_2 vs. product_category_3 we believe the missing values are on purpose. We will keep all the missing values and will deal with them in the data processing.
-3. We decide not to introduce feature interactions because the combination of 3 and 4 features can't find strong patterns. 
-4. The target column is slightly right skewed. We will use square root transformation to bring it into normal distribution.
-5. Because of the implementation of some of the recommendation lib, the target can only be within [0.0, 10.0]. Accordingly, we will transfer the target into that range by using the formula:
+2. The product_category_2 and product_category_3 have quite a few missing values. Especially the product_category_3 has a very high missing value rate. Considering the triangualar patterns between product_category_1 vs. product_category_2, and product_category_2 vs. product_category_3 we believe the missing values are on purpose. We will keep all the missing values and will deal with them in the data processing.
+3. Despite the widely spread imbalanced data distribuation, we didn't oberve obvious target vaule differences accross the categories. Therefore, we decide not to do data augmentation, data over-sampling, or any treatment. We will confirm whether to treat the imbalance issue later base on the model evaluation. 
+4. We decide not to introduce feature interactions because the combination of 3 and 4 features can't find strong patterns. 
+5. The target column is slightly right skewed. We will use square root transformation to bring it into normal distribution. In our downstream experiment, we will compare  models including linear model, tree models, and deep neural network. Our most tree-family model and DNN model has no problem with skewed input data, however the linear model assumes the input follow normal distributaion. Therefore, we need to normalise the data. 
+6. Because of the implementation of some of the recommendation lib, the target can only be within [0.0, 10.0]. Accordingly, we will transfer the target into that range by using the formula:
 
     transfered_target = sqrt(target - 3.464) / 15
-6. We are going to experiement two different types of models: recommender and regression. These models require different data features. Therefore, we need to prepare data in two different ways:
+7. We are going to experiement two different types of models: recommender and regression. These models require different data features. Therefore, we need to prepare data in two different ways:
     
     - recommender systems we are going to build only use user, product and the target. They are going to deal with categorical features directly. Thus no other data processing needs to be done.
     - regression systems requires categorical features to be transformed into numerical format. To avoid high dimension issue and still preserve information as much as possible, we use target encoding to transform all the 11 data features. Unlike label encoder or one-hot encoder that encode the categories into integer ids, target encoding use statistical information to represent the categories. In our case, we use the category grouped mean value of the target as the representative value. And we treat the missing value of the categories as a meaniful level. 
     
-## Data Preprocessing
+## 3.2.3.4 Preprocessing and the data pipeline
     Note: The following analysis can be found in the 05-KFP_Pipeline.ipynb.
 
 The original data file, train.csv, was uploaded on the GCS bucket. 
@@ -137,7 +152,7 @@ The last step of data preprocessing is to get X_train and X_test target encoded 
 <img src="./images/encoding.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
 
-## Model Selection
+## 3.2.3.5 Machine learning model designs and selection
 ###  Regressional Solutions
     Note: The following analysis can be found in the 02-Regression_Models.ipynb.
     
@@ -163,12 +178,12 @@ The feature importance chart of the XGB Regressor model is:
 
 <img src="./images/xgb_imp.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
-From the chart we can spot that user_id and product_id was the top two strongest features. That justified the inclusion of user_id and product_id by target_encoding. 
+From the chart we can spot that user_id and product_id were the top two strongest features. That justified our decision of including user_id and product_id by target_encoding. 
 
 ###  Recommendation Solutions
     Note: The following analysis can be found in the 03-Recommendation-FastAI.ipynb and 03-Recommendation-Surprise.ipynb.
 
-There are different implementations of recommendation system. In this case study, we compared two technolgies:
+There are different implementations of recommendation system. For instance, KNN, Matrix Decomposition, Collaborative Filter, and DNN. In this case study, we compared two technolgies:
 
 - SVD
 
@@ -190,7 +205,7 @@ In the obove SVD technology, the high-cardinal user and product features were de
 
 When running on the notebook, the Deep Learning model achieved scaled RMSE of 0.8624, which is significantly better than the XGB Regressor.
 
-## Model Training
+## 3.2.3.6 Machine learning model training and development
     Note: The following analysis can be found in the 05-KFP_Pipeline.ipynb.
 
 The best performing model is the DNN model trained using FastAI collab_learner. In order to control overfiting, the original data has been slipped into 75% as train set and 25% as test set. The model will be trained on the training set and eveluated using scaled RMSE and original RMSE on the test set. Unlike many other deep learning frameworks that use fixed learning rate or decreasing learning rate, FastAI uses cyclic learning rate to make the model training converge faster.
@@ -207,7 +222,7 @@ The deployed DNN Pytorch model training is in the train_dnn component:
 
 <img src="./images/train_dnn.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
-## Model Evaluation
+## 3.2.3.7 Machine learning model evaluation
     Note: The following analysis can be found in the 02-Regression_Models.ipynb and 03-Recommendation-FastAI.ipynb.
     
 So far, the best DNN model achieved scaled RMSE of 0.8624, while the best regresion model, XGB Regressor achieved 0.8846. The difference seems not significant. Lets see how the results look like.
@@ -219,11 +234,11 @@ So far, the best DNN model achieved scaled RMSE of 0.8624, while the best regres
 
 As it turned out, the models are over estimate for low target values and under estimate for high target values. And the DNN model result is slightly closer to the diagnal line. That meas the DNN model made less mistakes for both low target values and high target values. 
 
-A residual analysis has been done to spot whether there's any imbalanced errors. As it turned out, imbalanced errors do exist but not very significant. The imbalanced performance is closely related to the imbalanced data distribution. One proach to fix the problem is augment the unpopular categories. We elected not the augment the data because the performance differences are not too bad.  
+A residual analysis has been done to spot whether there's any imbalanced errors. As it turned out, imbalanced errors do exist but not very significant. The imbalanced performance is closely related to the imbalanced data distribution. One proach to fix the problem is oversampling the unpopular categories or generate synthetic data. We elected not the augment the data because the performance differences are not too bad.  
 
 <img src="./images/resid.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
-## Fairness Analaysis
+## 3.2.3.8 Fairness analysis
     Note: The following analysis can be found in the 02-Regression_Models.ipynb.
 
 The fairness analysis was based on the XGB Regressor model because the SVD and DNN models don't consider any demographic features and product category features. In order to evaluate the impact of including and excluding demographic features, we built a 'fair model' that is trained without demographic data features. The fair model achieve scaled RMSE of 0.9005, which is lower than the same xgb model with demographic features. 
@@ -246,7 +261,7 @@ We analysed the RMSE distribution in all the categorical levels, and found that 
 
 <img src="./images/residual.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
-Based on the above analysis, we concluded that the inclusion of the demographic features didn't cause unfair prediction. 
+Based on the above analysis, we concluded that the inclusion of the demographic features didn't cause significant unfair prediction. However, definition of fairness can be domain-specific. In real-world project, we need to highlight the subtle differences caused by including demographic features and let the business stake-holders to decide whether it's fair result or unfair.
 
 ## Model Deployment
     Note: The following analysis can be found in the 05-KFP_Pipeline.ipynb.
@@ -270,7 +285,7 @@ The pipeline has beed designed to be modifiable by changing parameters like rand
 
 Compared to most openly available Black Friday analysis, this case study produced higher performance. The lessons we learnt from the case study were:
 1. Using target encoding to deal with high dimensional categorical data features is a good idea.
-2. The user_id and product_id that are generally considered as low importancy features, however, by the help of recommendation concept, we can discover important patterns from the interactions of the user and product. The information was so rich that it outweight the information in all other data features. 
+2. The user_id and product_id that are generally considered as low importancy features, however, by the help of proper business requirement analysis and the right solution, we can discover important patterns from the interactions of the user and product. The information was so rich that it outweight the information in all other data features. 
 
 Limited by time and budget, the case study didn't dive deeper to achieve the highest performance. Things to consider in the further performance enhancement are:
 1. The Deep Learning outperforms all other models. It only use the user_id and product_id. It worths to include embedding of other features
@@ -278,14 +293,54 @@ Limited by time and budget, the case study didn't dive deeper to achieve the hig
 
 
 ## Resources
-- Code repository:
+### Evaluation Criteria
+
+| **Item** | **Requirement** | **Description** |
+|:---:|---|---|
+|       3.2.1 Code  | 3.2.1.1 Code repository     | Partners must provide a link to the code repository (for example, GitHub, GitLab, Google Cloud CSR), which includes a ReadMe file. <br> <br> Evidence must include an active link to the code repository containing all code that is used in demo #2. This code must be reviewable/readable by the assessor, and modifiable by the customer. In addition, the repository should contain a ReadMe file with code descriptions and instructions for running models/applications.  |
+|  | 3.2.1.2 Code origin certification  | Partners must certify to either of these two scenarios: 1) all code is original and developed within the partner organization, or 2) licensed code is used, post-modification. <br> <br> Evidence must include a certification by the partner organization for either of the above code origin scenarios. In addition, if licensed code is used post-modification, the partner must certify that the code has been modified per license specifications.  |
+|      3.2.2 Data  | 3.2.2.1 Dataset in Google Cloud  | Partners must provide documentation of where within Google Cloud the data of demo #2 is stored (for access by the machine learning models during training, testing, and in production).<br> <br> Evidence must include the Project Name and Project ID for the Google Cloud storage where the dataset (for demo #2) reside.  |
+|      3.2.3 Whitepaper / blog - describes the key steps of machine learning model development  | 3.2.3.1 Business goal and machine learning solution     | Partners must describe: <br> - The business question/goal being addressed <br> - The machine learning use case<br> - How the machine learning solution is expected to address the business question/goal <br> <br> Evidence must include (in the whitepaper) a top-line description of the business question/goal being addressed in this demo, and how the proposed machine learning solution is expected to address this business goal.  |
+|  | 3.2.3.2 Data exploration      | Partners must describe the following: <br> - How and what type of data exploration was performed<br> - What decisions were influenced by data exploration<br> <br> Evidence must include a description (in the whitepaper) of the tools used and the type of data exploration performed, along with code snippets (that achieve the data exploration). Additionally, the whitepaper must describe how the data/model algorithm/architecture decisions were influenced by the data exploration.  |
+|  | 3.2.3.3 Feature engineering     | Partners must describe the following: <br> - What feature engineering was performed <br> - What features were selected for use in the machine learning model and why <br> <br> Evidence must include a description (in the whitepaper) of the feature engineering performed (and rationale for the same), what original and engineered features were selected for incorporation as independent predictors in the machine learning model, and why. Evidence must include code snippets detailing the feature engineering and feature selection steps.  |
+|  | 3.2.3.4 Preprocessing and the data pipeline     | The partner must describe the data preprocessing pipeline, and how this is accomplished via a package/function that is a callable API (that is ultimately accessed by the served, production model). <br> <br> Evidence must include a description (in the whitepaper) of how data preprocessing is accomplished, along with the code snippet that performs data preprocessing as a callable API.  |
+|  | 3.2.3.5 Machine learning model design(s) and selection     | Partners must describe the following: <br> - Which machine learning model/algorithm(s) were chosen for demo #2? <br> - What criteria were used for machine learning model selection?  <br> Evidence must describe (in the whitepaper) selection criteria implemented, as well as the specific machine learning model algorithms that were selected for training and evaluation purposes. Code snippets detailing the model design and selection steps must be enumerated.  |
+|  |     3.2.3.6 Machine learning model training and development    | Partners must document the use of Vertex AI or Dataproc for machine learning model training, and describe the following:   <br>- Dataset sampling used for model training (and for dev/test independent datasets) and justification of sampling methods.  <br>- Implementation of model training, including adherence to Google Cloud best practices for distribution, device usage, and monitoring.  <br>- The model evaluation metric that is implemented, and a discussion of why the implemented metric is optimal given the business question/goal being addressed.  <br>- Hyperparameter tuning and model performance optimization  <br>- How bias/variance were determined (from the train-dev datasets) and tradeoffs used to influence and optimize machine learning model architecture  <br><br> Evidence must describe (in the whitepaper) each of the above machine learning model training and development points. In addition, code snippets that accomplish each of these tasks need to be enumerated.  |
+|  |     3.2.3.7 Machine learning model evaluation    | Partner must describe how the machine learning model, post-training, and architectural/hyperparameter optimization performs on an independent test dataset.  <br><br> Evidence must include records/data (in the whitepaper) of how the machine learning model developed and selected to address the business question performed on an independent test dataset (that reflects the distribution of data that the machine learning model is expected to encounter in a production environment). In addition, code snippets on model testing need to be enumerated.  |
+|        |     3.2.3.8 Fairness analysis  | Partner must describe possible fairness and bias implications of a profit maximization model trained on the Black Friday dataset and used for targeted marketing. How would they determine if the model had biases, and what they would do to mitigate the biases?    <br><br> Evidence must include a discussion of the implications of including purchaser demographics in a model used for targeted marketing, detail of at least one way to test for bias (for example, fairness indicators, comparing the model performance with and without demographics) and detail of at least one way to mitigate bias (for example, removing the demographic and location fields, using mindiff to equalize the profit prediction across certain demographic characteristics). Stating the model shouldn't be used for marketing is acceptable in lieu of a discussion of how to correct bias. Refer to this page for more information. 300-600 words recommended.   |
+|      3.2.4 Proof of deployment  |     3.2.4.1 Model/ application on Google Cloud    | Partners must provide proof that the machine learning model/application is deployed and served on Google Cloud with Vertex AI (or Endpoint) or Dataproc.   <br><br> Evidence must include the Project Name and Project ID of the deployed machine learning model.  |
+|  |     3.2.4.2 Callable library/ application    | Partners must demonstrate that the machine learning model for demo #2 is a callable library and/or application.   <br><br> Evidence must include a demonstration of how the served model can be used to make a prediction via an API call.  |
+|  |     3.2.4.3 Editable Model/ application  | Partners must demonstrate that the deployed machine learning model is customizable.   <br><br> Evidence must include a demonstration that the deployed model is fully functional after an appropriate code modification, as might be performed by a customer.    |
+
+### 3.2.1.1 Code repository
     https://github.com/intelia-agility/mlspecialisation/tree/usecase2/usecase2.git
+
+### 3.2.2.1 Dataset in Google Cloud
 - GCP project: blackfridayintelia
 - Data source: gs://blackfriday_data/train.csv
+
+### 3.2.1.2 Code origin certification
+We Intelia confirm that all code of this case study is original and developed within our organization
+
+### 3.2.4.1 Model or application on Google Cloud
 - Vertex pipeline: https://console.cloud.google.com/vertex-ai/locations/us-central1/pipelines/runs/blackfriday-pipeline-v0-20231101052843?project=blackfridayintelia&supportedpurview=project
 - Deployed models:
     - DNN model: https://console.cloud.google.com/vertex-ai/locations/us-central1/models/2955405891601432576/versions/1?project=blackfridayintelia&supportedpurview=project
     - XGB model: https://console.cloud.google.com/vertex-ai/locations/us-central1/models/7472516317854040064/versions/1?project=blackfridayintelia&supportedpurview=project
+ 
+### 3.2.4.2 Callable library or application
 - Deployed endpoints: 
     - DNN endpoint: https://console.cloud.google.com/vertex-ai/locations/us-central1/endpoints/2140390698489217024?project=blackfridayintelia&supportedpurview=project
     - XGB endpoint: https://console.cloud.google.com/vertex-ai/locations/us-central1/endpoints/334447247913648128?project=blackfridayintelia&supportedpurview=project
+
+### 3.2.4.3 Editable Model or application
+The best performant model is a PyTorch model, with two embedding inputs and one linear layer as the following:
+
+<img src="./images/DNN.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
+
+Model editing can be done by:
+1. customizing embedding size by setting emb_szs
+2. changing linear layer number of parameters by setting n_factors
+3. modifying the dropout probability by setting ps
+4. modifying DNN structure by setting layers
+5. changing to a more sophisticated model by providing a subclass of TabularModel 
