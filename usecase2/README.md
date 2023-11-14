@@ -11,26 +11,26 @@ The Black Friday Kaggle dataset is a six-year-old dataset with over 31,000 downl
 Despite the popularity of the Kaggle Black Friday Prediction dataset, many open analyses did not sufficiently consider the business requirements, resulting in mostly underperforming outcomes. In our case study, we discovered that the dataset's purpose is to generate personalized predictions for individual users and individual products, rather than a generic regression task. Based on our understanding of the business, we developed both a personalized prediction regression model and a recommendation system. We demonstrated that by properly comprehending the business requirements, we can produce high-quality work in feature engineering, model selection, and evaluation. Finally, we demonstrated our model development process on Vertex AI.
 
 # Table of Content
-- [3.2.3.1 Business goal and machine learning solution](#3.2.3.1-Business-goal-and-machine-learning-solution)
-- [3.2.3.2 Data exploration](#3.2.3.2-Data-exploration)
-- [3.2.3.3 Feature engineering](#3.2.3.3-Feature-engineering)
-- [3.2.3.4 Preprocessing and the data pipeline](#3.2.3.4-Preprocessing-and-the-data-pipeline)
-- [3.2.3.5 Machine learning model design(s) and selection](#3.2.3.5-Machine-learning-model-designs-and-selection)
+- [3.2.3.1 Business goal and machine learning solution](#3.2.3.1-business-goal-and-machine-learning-solution)
+- [3.2.3.2 Data exploration](#3.2.3.2-data-exploration)
+- [3.2.3.3 Feature engineering](#3.2.3.3-feature-engineering)
+- [3.2.3.4 Preprocessing and the data pipeline](#3.2.3.4-preprocessing-and-the-data-pipeline)
+- [3.2.3.5 Machine learning model design(s) and selection](#3.2.3.5-machine-learning-model-designs-and-selection)
    - Regressional Solutions
    - Recommendation Solutions
-- [3.2.3.6 Machine learning model training and development](#3.2.3.6-Machine-learning-model-training-and-development)
-- [3.2.3.7 Machine learning model evaluation](#3.2.3.7-Machine-learning-model-evaluation)
-- [3.2.3.8 Fairness analysis](#3.2.3.8-Fairness-analysis)
+- [3.2.3.6 Machine learning model training and development](#3.2.3.6-machine-learning-model-training-and-development)
+- [3.2.3.7 Machine learning model evaluation](#3.2.3.7-machine-learning-model-evaluation)
+- [3.2.3.8 Fairness analysis](#3.2.3.8-fairness-analysis)
 - Model Deployment
 - Conclusion
-- [Resources](#Resources)
-    - [Evaluation Criteria](#Evaluation-Criteria)
-    - [3.2.1.1 Code repository](#3.2.1.1-Code-repository)
-    - [3.2.1.2 Code origin certification](#3.2.1.2-Code-origin-certification)
-    - [3.2.2.1 Dataset in Google Cloud](#3.2.2.1-Dataset-in-Google-Cloud)
-    - [3.2.4.1 Model/ application on Google Cloud](#3.2.4.1-Model-or-application-on-Google-Cloud)
-    - [3.2.4.2 Callable library/ application](#3.2.4.2-Callable-library-or-application)
-    - [3.2.4.3 Editable Model/ application](#3.2.4.3-Editable-Model-or-application)
+- [Resources](#resources)
+    - [Evaluation Criteria](#evaluation-criteria)
+    - [3.2.1.1 Code repository](#3.2.1.1-code-repository)
+    - [3.2.1.2 Code origin certification](#3.2.1.2-code-origin-certification)
+    - [3.2.2.1 Dataset in Google Cloud](#3.2.2.1-dataset-in-google-cloud)
+    - [3.2.4.1 Model/ application on Google Cloud](#3.2.4.1-model-or-application-on-google-cloud)
+    - [3.2.4.2 Callable library/ application](#3.2.4.2-callable-library-or-application)
+    - [3.2.4.3 Editable Model/ application](#3.2.4.3-editable-model-or-application)
 
 ## 3.2.3.1 Business goal and machine learning solution
     Note: The following analysis can be found in the 01-EDA.ipynb.
