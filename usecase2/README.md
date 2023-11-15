@@ -33,7 +33,7 @@ Despite the popularity of the Kaggle Black Friday Prediction dataset, many open 
     - [3.2.4.3 Editable Model/ application](#3243-editable-model-or-application)
 
 ## 3.2.3.1 Business goal and machine learning solution
-    Note: The following analysis can be found in the 01-EDA.ipynb.
+**Note:** The following analysis can be found in the 01-EDA.ipynb.
 
 The first step is to understand what kinds of analysis the dataset allows us to achieve. By comparing the training and test sets, it is clear that all users and products in the test set are also in the training set, the the combination of user and product in the test set has no intersection with the same combination of the train set. 
 
@@ -52,7 +52,7 @@ To avoid the high-cardinality dimension problem, all the open analyses either dr
 In this case study we will show how to implement personalized prediction using regression technology, and how to use recommendation solutions to provide superior results. We will demonstrate that based on accurate business understanding, both of the solutions produce much better performance than all open models.
 
 ## 3.2.3.2 Data exploration
-    Note: The following analysis can be found in the 01-EDA.ipynb.
+**Note:** The following analysis can be found in the 01-EDA.ipynb.
     
 The univariate analysis and bivariate analysis were done by using the framework ydata-profiling which can automatically generate profiling reports. We use manual plotting to analyze three-way and four-way feature interactions. The basic information of the dataset is as follows:
 
@@ -109,7 +109,8 @@ and Kurtosis -0.33837756558517285
 </p>
 
 ## 3.2.3.3 Feature engineering
-    Note: The following analysis can be found in the 01-EDA.ipynb.
+**Note:** The following analysis can be found in the 01-EDA.ipynb.
+    
 Based on the explorative data analysis, we found that:
 1. Despite that the product_category_1, product_category_2, product_category_3, user_id, occupation, and marital_status are all numerical, they are more likely to be categorical features instead. In the following feature processing, we will cast all data features as categorical. 
 2. The product_category_2 and product_category_3 have quite a few missing values. Especially the product_category_3 has a very high missing value rate. Considering the triangular patterns between product_category_1 vs. product_category_2, and product_category_2 vs. product_category_3 we believe the missing values are on purpose. We will keep all the missing values and will deal with them in the data processing.
@@ -125,7 +126,7 @@ Based on the explorative data analysis, we found that:
     - regression systems require categorical features to be transformed into numerical format. To avoid high-dimension issues and still preserve information as much as possible, we use target encoding to transform all 11 data features. Unlike label encoder or one-hot encoder that encodes the categories into integer IDs, target encoding uses statistical information to represent the categories. In our case, we use the category-grouped mean value of the target as the representative value. And we treat the missing value of the categories as a meaningful level. 
     
 ## 3.2.3.4 Preprocessing and the data pipeline
-    Note: The following analysis can be found in the 05-KFP_Pipeline.ipynb.
+**Note:** The following analysis can be found in the 05-KFP_Pipeline.ipynb.
 
 The original data file, train.csv, was uploaded to the GCS bucket. 
 
@@ -154,7 +155,7 @@ The last step of data preprocessing is to get X_train and X_test targets encoded
 
 ## 3.2.3.5 Machine learning model designs and selection
 ###  Regressional Solutions
-    Note: The following analysis can be found in the 02-Regression_Models.ipynb.
+**Note:** The following analysis can be found in the 02-Regression_Models.ipynb.
     
 Based on the same preprocessed data features, we compared the performance of three regular regression models: Linear Regressor, XGB Regressor, and LightGB Regressor. We use the RMSE of the scaled target value as the main metrics and calculated the RMSE on the original target values to make it easier to understand. 
 
@@ -181,7 +182,7 @@ The feature importance chart of the XGB Regressor model is:
 From the chart we can spot that user_id and product_id were the top two strongest features. That justified our decision to include user_id and product_id by target_encoding. 
 
 ###  Recommendation Solutions
-    Note: The following analysis can be found in the 03-Recommendation-FastAI.ipynb and 03-Recommendation-Surprise.ipynb.
+**Note:** The following analysis can be found in the 03-Recommendation-FastAI.ipynb and 03-Recommendation-Surprise.ipynb.
 
 There are different implementations of recommendation systems. For instance, KNN, Matrix Decomposition, Collaborative Filter, and DNN. In this case study, we compared two technologies:
 
@@ -206,7 +207,7 @@ In the above SVD technology, the high-cardinal user and product features were de
 When running on the notebook, the Deep Learning model achieved the scaled RMSE of 0.8624, which is significantly better than the XGB Regressor.
 
 ## 3.2.3.6 Machine learning model training and development
-    Note: The following analysis can be found in the 05-KFP_Pipeline.ipynb.
+**Note:** The following analysis can be found in the 05-KFP_Pipeline.ipynb.
 
 The best-performing model is the DNN model trained using FastAI collab_learner. In order to control overfitting, the original data has been slipped into 75% as the train set and 25% as the test set. The model will be trained on the training set and evaluated using scaled RMSE and original RMSE on the test set. Unlike many other deep learning frameworks that use a fixed learning rate or decreasing learning rate, FastAI uses a cyclic learning rate to make the model training converge faster.
 
@@ -223,7 +224,7 @@ The deployed DNN Pytorch model training is in the train_dnn component:
 <img src="./images/train_dnn.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
 ## 3.2.3.7 Machine learning model evaluation
-    Note: The following analysis can be found in the 02-Regression_Models.ipynb and 03-Recommendation-FastAI.ipynb.
+**Note:** The following analysis can be found in the 02-Regression_Models.ipynb and 03-Recommendation-FastAI.ipynb.
     
 So far, the best DNN model achieved a scaled RMSE of 0.8624, while the best regression model, XGB Regressor achieved 0.8846. The difference seems not significant. Let's see what the results look like.
 
@@ -239,7 +240,7 @@ A residual analysis has been done to spot whether there are any imbalanced error
 <img src="./images/resid.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
 ## 3.2.3.8 Fairness analysis
-    Note: The following analysis can be found in the 02-Regression_Models.ipynb.
+**Note:** The following analysis can be found in the 02-Regression_Models.ipynb.
 
 The fairness analysis was based on the XGB Regressor model because the SVD and DNN models don't consider any demographic features and product category features. In order to evaluate the impact of including and excluding demographic features, we built a 'fair model' that is trained without demographic data features. The fair model achieves a scaled RMSE of 0.9005, which is lower than the same XGB model with demographic features. 
 
@@ -264,7 +265,7 @@ We analyzed the RMSE distribution in all the categorical levels and found that t
 Based on the above analysis, we concluded that the inclusion of the demographic features didn't cause significant unfair predictions. However, the definition of fairness can be domain-specific. In a real-world project, we need to highlight the subtle differences caused by including demographic features and let the business stakeholders decide whether it's fair result or unfair.
 
 ## Model Deployment
-    Note: The following analysis can be found in the 05-KFP_Pipeline.ipynb.
+**Note:** The following analysis can be found in the 05-KFP_Pipeline.ipynb.
 
 <img src="./images/vertex_pipeline.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
