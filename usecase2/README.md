@@ -8,7 +8,7 @@ The Black Friday Kaggle dataset is a six-year-old dataset with over 31,000 downl
 
 <img src="./images/kaggle_BF.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
-Despite the popularity of the Kaggle Black Friday Prediction dataset, many open analyses did not sufficiently consider the business requirements, resulting in mostly underperforming outcomes. In our case study, we discovered that the dataset's purpose is to generate personalized predictions for individual users and individual products, rather than a generic regression task. Based on our understanding of the business, we developed both a personalized prediction regression model and a recommendation system. We demonstrated that by properly comprehending the business requirements, we can produce high-quality work in feature engineering, model selection, and evaluation. Finally, we demonstrated our model development process on Vertex AI.
+Despite the popularity of the Kaggle Black Friday Prediction dataset, many open analyses failed to consider the business requirements adequately, leading to mostly underperforming results. Our case study revealed that the dataset’s purpose is to generate personalized predictions for individual users and products, rather than a generic regression task. By understanding the business requirements, we developed both a personalized prediction regression model and a recommendation system. We demonstrated that by properly comprehending the business requirements, we can produce high-quality work in feature engineering, model selection, and evaluation. Finally, we showcased our model development process on Vertex AI.
 
 # Table of Content
 - [3.2.3.1 Business goal and machine learning solution](#3231-business-goal-and-machine-learning-solution)
