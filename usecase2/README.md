@@ -43,11 +43,15 @@ The goal is to use users' past purchases to predict how likely they are to buy o
 
 The difference between regression and personalization is that while regression models learn global patterns, personalization models learn the interactions between users and products. Regular regression models can still learn the interactions when the data size is small. The real problem becomes significant when the data size gets larger.
 
+[TM - START CUT]
+
 In order for the model to learn about personalized interactions, both the user and the product features must be treated as categorical features. In most cases, both of them have large numbers of levels. In our case of Black Friday Prediction, there are 5891 users and 3623 products. This is already a very tiny dataset, but it is already out of the comfort zone for regular regression models.
 
 The standard method for regression models to deal with categorical features is one-hot encoding, or putting each categorical level as a new column. However, that technique doesn’t work for the personalization task because 5891 x 3623 will produce a very large and very sparse 2D array. The number of cells in the array is much greater than the number of rows in the dataset. The resulting array is so sparse that the majority of the cells would be empty. This makes the computation very challenging, and more importantly, the general regression models couldn’t learn anything from the array because of the curse of the high dimensionality.
 
 To avoid the high-cardinality dimension problem, all the open analyses either dropped the product column, the user column, or both. With the product and user columns dropped, the models were unable to learn personalized purchasing behavior.
+
+[TM - END CUT]
 
 In this case study we will show how to implement personalized prediction using regression technology, and how to use recommendation solutions to provide superior results. We will demonstrate that based on accurate business understanding, both of the solutions produce much better performance than all open models.
 
@@ -109,7 +113,7 @@ and Kurtosis -0.33837756558517285
 </p>
 
 ## 3.2.3.3 Feature engineering
-**Note:** The following analysis can be found in the 01-EDA.ipynb.
+**Note:** The following analysis can be found in the 01-EDA.ipynb. [TM - LINK to CELL]
     
 Based on the explorative data analysis, we found that:
 1. Despite that the product_category_1, product_category_2, product_category_3, user_id, occupation, and marital_status are all numerical, they are more likely to be categorical features instead. In the following feature processing, we will cast all data features as categorical. 
