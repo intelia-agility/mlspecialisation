@@ -311,7 +311,7 @@ Limited by time and budget, the case study didn't dive deeper to achieve the hig
     https://github.com/intelia-agility/mlspecialisation/tree/usecase2/usecase2.git
 
 ### 3.2.1.2 Code origin certification
-We Intelia confirm that all code of this case study is original and developed within our organization
+We Intelia confirm that all code of this case study is original and developed within our organization.
 
 ### 3.2.2.1 Dataset in Google Cloud
 - GCP project: blackfridayintelia
