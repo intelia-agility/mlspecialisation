@@ -29,8 +29,8 @@ Despite the popularity of the Kaggle Black Friday Prediction dataset, many open 
     - [3.2.3.8 Fairness analysis](#3238-Fairness-analysis)
 - [3.2.4 Deployment](#324-Deployment)
     - [3.2.4.1 Model/ application on Google Cloud](#3241-Model-or-application-on-Google-Cloud)
-    - [3.2.4.2 Callable library/ application](#3.2.4.2-Callable-library-or-application)
-    - [3.2.4.3 Editable Model/ application](#3.2.4.3-Editable-Model-or-application)
+    - [3.2.4.2 Callable library/ application](#3242-Callable-library-or-application)
+    - [3.2.4.3 Editable Model/ application](#3243-Editable-Model-or-application)
 
 - [Conclusion](#Conclusion)
 - [Resources](#Resources)
