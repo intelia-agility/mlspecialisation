@@ -11,28 +11,45 @@ The Black Friday Kaggle dataset is a six-year-old dataset with over 31,000 downl
 Despite the popularity of the Kaggle Black Friday Prediction dataset, many open analyses failed to consider the business requirements adequately, leading to mostly underperforming results. Our case study revealed that the dataset’s purpose is to generate personalized predictions for individual users and products, rather than a generic regression task. By understanding the business requirements, we developed both a personalized prediction regression model and a recommendation system. We demonstrated that by properly comprehending the business requirements, we can produce high-quality work in feature engineering, model selection, and evaluation. Finally, we showcased our model development process on Vertex AI.
 
 # Table of Content
-- [3.2.3.1 Business goal and machine learning solution](#3231-business-goal-and-machine-learning-solution)
-- [3.2.3.2 Data exploration](#3232-data-exploration)
-- [3.2.3.3 Feature engineering](#3233-feature-engineering)
-- [3.2.3.4 Preprocessing and the data pipeline](#3234-preprocessing-and-the-data-pipeline)
-- [3.2.3.5 Machine learning model design(s) and selection](#3235-machine-learning-model-designs-and-selection)
-   - Regressional Solutions
-   - Recommendation Solutions
-- [3.2.3.6 Machine learning model training and development](#3236-machine-learning-model-training-and-development)
-- [3.2.3.7 Machine learning model evaluation](#3237-machine-learning-model-evaluation)
-- [3.2.3.8 Fairness analysis](#3238-fairness-analysis)
-- Model Deployment
-- Conclusion
-- [Resources](#resources)
-    - [Evaluation Criteria](#evaluation-criteria)
-    - [3.2.1.1 Code repository](#3211-code-repository)
-    - [3.2.1.2 Code origin certification](#3212-code-origin-certification)
-    - [3.2.2.1 Dataset in Google Cloud](#3221-dataset-in-google-cloud)
-    - [3.2.4.1 Model/ application on Google Cloud](#3241-model-or-application-on-google-cloud)
-    - [3.2.4.2 Callable library/ application](#3242-callable-library-or-application)
-    - [3.2.4.3 Editable Model/ application](#3243-editable-model-or-application)
+- [3.2.1 Code](#3.2.1-Code)
+    - [3.2.1.1 Code repository](#3.2.1.1-Code-repository)
+    - [3.2.1.2 Code origin certification](#3.2.1.2-Code-origin-certification)
+- [3.2.2 Data](#3.2.2-Data)
+    - [3.2.2.1 Dataset in Google Cloud](#3.2.2.1-Dataset-in-Google-Cloud)
+- [3.2.3 Solution](#3.2.3-Solution)
+    - [3.2.3.1 Business goal and machine learning solution](#3.2.3.1-Business-goal-and-machine-learning-solution)
+    - [3.2.3.2 Data exploration](#3.2.3.2-Data-exploration)
+    - [3.2.3.3 Feature engineering](#3.2.3.3-Feature-engineering)
+    - [3.2.3.4 Preprocessing and the data pipeline](#3.2.3.4-Preprocessing-and-the-data-pipeline)
+    - [3.2.3.5 Machine learning model design(s) and selection](#3.2.3.5-Machine-learning-model-designs-and-selection)
+       - [Regressional Solutions](#Regressional-Solutions)
+       - [Recommendation Solutions](#Recommendation-Solutions)
+    - [3.2.3.6 Machine learning model training and development](#3.2.3.6-Machine-learning-model-training-and-development)
+    - [3.2.3.7 Machine learning model evaluation](#3.2.3.7-Machine-learning-model-evaluation)
+    - [3.2.3.8 Fairness analysis](#3.2.3.8-Fairness-analysis)
+- [3.2.4 Deployment](#3.2.4-Deployment)
+    - [3.2.4.1 Model/ application on Google Cloud](#3.2.4.1-Model-or-application-on-Google-Cloud)
+    - [3.2.4.2 Callable library/ application](#3.2.4.2-Callable-library-or-application)
+    - [3.2.4.3 Editable Model/ application](#3.2.4.3-Editable-Model-or-application)
 
-## 3.2.3.1 Business goal and machine learning solution
+- [Conclusion](#Conclusion)
+- [Resources](#Resources)
+    - [Evaluation Criteria](#Evaluation-Criteria)
+
+## 3.2.1 Code
+### 3.2.1.1 Code repository
+    https://github.com/intelia-agility/mlspecialisation/tree/usecase2/usecase2.git
+
+### 3.2.1.2 Code origin certification
+We Intelia confirm that all code of this case study is original and developed within our organization.
+
+## 3.2.2 Data
+### 3.2.2.1 Dataset in Google Cloud
+- GCP project: blackfridayintelia
+- Data source: gs://blackfriday_data/train.csv
+
+## 3.2.3 Solution
+### 3.2.3.1 Business goal and machine learning solution
 **Note:** The following analysis can be found in the 01-EDA.ipynb.
 
 The first step is to understand what kinds of analysis the dataset allows us to achieve. By comparing the training and test sets, it is clear that all users and products in the test set are also in the training set, the the combination of user and product in the test set has no intersection with the same combination of the train set. 
@@ -45,7 +62,7 @@ The difference between regression and personalization is that while regression m
 
 In this case study we will show how to implement personalized prediction using regression technology, and how to use recommendation solutions to provide superior results. We will demonstrate that based on accurate business understanding, both of the solutions produce much better performance than all open models.
 
-## 3.2.3.2 Data exploration
+### 3.2.3.2 Data exploration
 **Note:** The following analysis can be found in the 01-EDA.ipynb.
     
 The univariate analysis and bivariate analysis were done by using the framework ydata-profiling which can automatically generate profiling reports. We use manual plotting to analyze three-way and four-way feature interactions. The basic information of the dataset is as follows:
@@ -102,7 +119,7 @@ and Kurtosis -0.33837756558517285
 <img src="./images/pd7.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 </p>
 
-## 3.2.3.3 Feature engineering
+### 3.2.3.3 Feature engineering
 **Note:** The following analysis can be found in the 01-EDA.ipynb.
     
 Based on the explorative data analysis, we found that:
@@ -119,7 +136,7 @@ Based on the explorative data analysis, we found that:
     - recommender systems we are going to build only use user, product, and target. They are going to deal with categorical features directly. Thus no other data processing needs to be done.
     - regression systems require categorical features to be transformed into numerical format. To avoid high-dimension issues and still preserve information as much as possible, we use target encoding to transform all 11 data features. Unlike label encoder or one-hot encoder that encodes the categories into integer IDs, target encoding uses statistical information to represent the categories. In our case, we use the category-grouped mean value of the target as the representative value. And we treat the missing value of the categories as a meaningful level. 
     
-## 3.2.3.4 Preprocessing and the data pipeline
+### 3.2.3.4 Preprocessing and the data pipeline
 **Note:** The following analysis can be found in the 05-KFP_Pipeline.ipynb.
 
 The original data file, train.csv, was uploaded to the GCS bucket. 
@@ -147,8 +164,8 @@ The last step of data preprocessing is to get X_train and X_test targets encoded
 <img src="./images/encoding.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
 
-## 3.2.3.5 Machine learning model designs and selection
-###  Regressional Solutions
+### 3.2.3.5 Machine learning model designs and selection
+####  Regressional Solutions
 **Note:** The following analysis can be found in the 02-Regression_Models.ipynb.
     
 Based on the same preprocessed data features, we compared the performance of three regular regression models: Linear Regressor, XGB Regressor, and LightGB Regressor. We use the RMSE of the scaled target value as the main metrics and calculated the RMSE on the original target values to make it easier to understand. 
@@ -175,7 +192,7 @@ The feature importance chart of the XGB Regressor model is:
 
 From the chart we can spot that user_id and product_id were the top two strongest features. That justified our decision to include user_id and product_id by target_encoding. 
 
-###  Recommendation Solutions
+####  Recommendation Solutions
 **Note:** The following analysis can be found in the 03-Recommendation-FastAI.ipynb and 03-Recommendation-Surprise.ipynb.
 
 There are different implementations of recommendation systems. For instance, KNN, Matrix Decomposition, Collaborative Filter, and DNN. In this case study, we compared two technologies:
@@ -200,7 +217,7 @@ In the above SVD technology, the high-cardinal user and product features were de
 
 When running on the notebook, the Deep Learning model achieved the scaled RMSE of 0.8624, which is significantly better than the XGB Regressor.
 
-## 3.2.3.6 Machine learning model training and development
+### 3.2.3.6 Machine learning model training and development
 **Note:** The following analysis can be found in the 05-KFP_Pipeline.ipynb.
 
 The best-performing model is the DNN model trained using FastAI collab_learner. In order to control overfitting, the original data has been slipped into 75% as the train set and 25% as the test set. The model will be trained on the training set and evaluated using scaled RMSE and original RMSE on the test set. Unlike many other deep learning frameworks that use a fixed learning rate or decreasing learning rate, FastAI uses a cyclic learning rate to make the model training converge faster.
@@ -217,7 +234,7 @@ The deployed DNN Pytorch model training is in the train_dnn component:
 
 <img src="./images/train_dnn.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
-## 3.2.3.7 Machine learning model evaluation
+### 3.2.3.7 Machine learning model evaluation
 **Note:** The following analysis can be found in the 02-Regression_Models.ipynb and 03-Recommendation-FastAI.ipynb.
     
 So far, the best DNN model achieved a scaled RMSE of 0.8624, while the best regression model, XGB Regressor achieved 0.8846. The difference seems not significant. Let's see what the results look like.
@@ -233,7 +250,7 @@ A residual analysis has been done to spot whether there are any imbalanced error
 
 <img src="./images/resid.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
-## 3.2.3.8 Fairness analysis
+### 3.2.3.8 Fairness analysis
 **Note:** The following analysis can be found in the 02-Regression_Models.ipynb.
 
 The fairness analysis was based on the XGB Regressor model because the SVD and DNN models don't consider any demographic features and product category features. In order to evaluate the impact of including and excluding demographic features, we built a 'fair model' that is trained without demographic data features. The fair model achieves a scaled RMSE of 0.9005, which is lower than the same XGB model with demographic features. 
@@ -258,7 +275,7 @@ We analyzed the RMSE distribution in all the categorical levels and found that t
 
 Based on the above analysis, we concluded that the inclusion of the demographic features didn't cause significant unfair predictions. However, the definition of fairness can be domain-specific. In a real-world project, we need to highlight the subtle differences caused by including demographic features and let the business stakeholders decide whether it's fair result or unfair.
 
-## Model Deployment
+## 3.2.4 Deployment
 **Note:** The following analysis can be found in the 05-KFP_Pipeline.ipynb.
 
 <img src="./images/vertex_pipeline.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
@@ -275,6 +292,29 @@ As depicted above, the Vertex pipeline was composed of the whole process of the 
 9. deploy both the two models to their individual endpoint
 
 The pipeline has been designed to be modifiable by changing parameters like random_seed, train-test split ratio, etc. Both the scaled RMSE and the original RMSE were published as the result of the model training. 
+
+### 3.2.4.1 Model or application on Google Cloud
+- Vertex pipeline: https://console.cloud.google.com/vertex-ai/locations/us-central1/pipelines/runs/blackfriday-pipeline-v0-20231101052843?project=blackfridayintelia&supportedpurview=project
+- Deployed models:
+    - DNN model: https://console.cloud.google.com/vertex-ai/locations/us-central1/models/2955405891601432576/versions/1?project=blackfridayintelia&supportedpurview=project
+    - XGB model: https://console.cloud.google.com/vertex-ai/locations/us-central1/models/7472516317854040064/versions/1?project=blackfridayintelia&supportedpurview=project
+ 
+### 3.2.4.2 Callable library or application
+- Deployed endpoints: 
+    - DNN endpoint: https://console.cloud.google.com/vertex-ai/locations/us-central1/endpoints/2140390698489217024?project=blackfridayintelia&supportedpurview=project
+    - XGB endpoint: https://console.cloud.google.com/vertex-ai/locations/us-central1/endpoints/334447247913648128?project=blackfridayintelia&supportedpurview=project
+
+### 3.2.4.3 Editable Model or application
+The best performant model is a PyTorch model, with two embedding inputs and one linear layer as the following:
+
+<img src="./images/DNN.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
+
+Model editing can be done by:
+1. customizing embedding size by setting emb_szs
+2. changing linear layer number of parameters by setting n_factors
+3. modifying the dropout probability by setting ps
+4. modifying DNN structure by setting layers
+5. changing to a more sophisticated model by providing a subclass of TabularModel 
 
 ## Conclusion
 
@@ -307,35 +347,3 @@ Limited by time and budget, the case study didn't dive deeper to achieve the hig
 |  |     3.2.4.2 Callable library/ application    | Partners must demonstrate that the machine learning model for demo #2 is a callable library and/or application.   <br><br> Evidence must include a demonstration of how the served model can be used to make a prediction via an API call.  |
 |  |     3.2.4.3 Editable Model/ application  | Partners must demonstrate that the deployed machine learning model is customizable.   <br><br> Evidence must include a demonstration that the deployed model is fully functional after an appropriate code modification, as might be performed by a customer.    |
 
-### 3.2.1.1 Code repository
-    https://github.com/intelia-agility/mlspecialisation/tree/usecase2/usecase2.git
-
-### 3.2.1.2 Code origin certification
-We Intelia confirm that all code of this case study is original and developed within our organization.
-
-### 3.2.2.1 Dataset in Google Cloud
-- GCP project: blackfridayintelia
-- Data source: gs://blackfriday_data/train.csv
-
-### 3.2.4.1 Model or application on Google Cloud
-- Vertex pipeline: https://console.cloud.google.com/vertex-ai/locations/us-central1/pipelines/runs/blackfriday-pipeline-v0-20231101052843?project=blackfridayintelia&supportedpurview=project
-- Deployed models:
-    - DNN model: https://console.cloud.google.com/vertex-ai/locations/us-central1/models/2955405891601432576/versions/1?project=blackfridayintelia&supportedpurview=project
-    - XGB model: https://console.cloud.google.com/vertex-ai/locations/us-central1/models/7472516317854040064/versions/1?project=blackfridayintelia&supportedpurview=project
- 
-### 3.2.4.2 Callable library or application
-- Deployed endpoints: 
-    - DNN endpoint: https://console.cloud.google.com/vertex-ai/locations/us-central1/endpoints/2140390698489217024?project=blackfridayintelia&supportedpurview=project
-    - XGB endpoint: https://console.cloud.google.com/vertex-ai/locations/us-central1/endpoints/334447247913648128?project=blackfridayintelia&supportedpurview=project
-
-### 3.2.4.3 Editable Model or application
-The best performant model is a PyTorch model, with two embedding inputs and one linear layer as the following:
-
-<img src="./images/DNN.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
-
-Model editing can be done by:
-1. customizing embedding size by setting emb_szs
-2. changing linear layer number of parameters by setting n_factors
-3. modifying the dropout probability by setting ps
-4. modifying DNN structure by setting layers
-5. changing to a more sophisticated model by providing a subclass of TabularModel 
