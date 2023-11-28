@@ -196,9 +196,7 @@ Based on the above explorative data analysis, we decided on the following approa
 
 6. Because of the implementation of some of the recommendation lib, the target can only be within [0.0, 10.0]. Accordingly, we will transfer the target into that range by using the formula:
 
-$$y_{t} = {\sqrt{y} - 3.464 \over 15}\\
-y:\ target\ value\\
-y_{t}:\ transformed\ target\ value$$
+$$y_{t} = {\sqrt{y} - 3.464 \over 15} \\ y:\ target\ value \\ y_{t}:\ transformed\ target\ value$$
 
 There are multiple ways of normalise irregular data distributions, including log transformation, and more complicated boxcox transformation. We selected sqrt transformation because the skewness of the target wasn't too bad, thus sqrt transformation will be more suitable. After the transformation, the target data backed to normal distribution, and the range fits [0.0, 10.0]. 
 
@@ -244,10 +242,9 @@ The transformed dataset will be split into X_train, y_train, X_test, y_test in t
 <img src="./images/traintestsplit.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
 The last step of data preprocessing is to get X_train and X_test targets encoded in the target_encoding component. This component takes  
-the X_train, y_train, and X_test as input parameters. It use y_train and X_train to fit the encoding
+the X_train, y_train, and X_test as input parameters. It use y_train and X_train to fit the target_encoder, and transform bothe X_train, X_test with the encoder. 
 
 <img src="./images/encoding.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
-
 
 ### 3.2.3.5 Machine learning model designs and selection
 ####  Regressional Solutions
