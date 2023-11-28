@@ -46,6 +46,8 @@ We Intelia confirm that all code of this case study is original and developed wi
 
 ## 3.2.2 Data
 ### 3.2.2.1 Dataset in Google Cloud
+The original Black Friday Sales Prediction dataset has two data files in csv format: train.csv and test.csv. The test.csv is the private test set for the Kaggle competition leaderboard benchmarking. It doesn't have target column so is no use in this case study. Our case study is based on the train.csv only.
+
 - GCP project: blackfridayintelia
 - Data source: gs://blackfriday_data/train.csv
 
@@ -180,31 +182,48 @@ At this stage, we didn't found the data imbalance is strongly linked to very dif
 ### 3.2.3.3 Feature engineering
 **Note:** The following analysis can be found in the 01-EDA.ipynb.
     
-In conclusion, based on the explorative data analysis, we found that:
+Based on the above explorative data analysis, we decided on the following approach in feature engineering. The code will be explained in detail in the following chapter.
 
-1. Despite that the product_category_1, product_category_2, product_category_3, user_id, occupation, and marital_status are all numerical, they are more likely to be categorical features instead. In the following feature processing, we will cast all data features as categorical. 
+1. Despite that the product_category_1, product_category_2, product_category_3, user_id, occupation, and marital_status are all numerical, they are more likely to be categorical features instead. In the following feature processing, we will treat all data features as categorical features. 
 
 2. The product_category_2 and product_category_3 have quite a few missing values. Especially the product_category_3 has a very high missing value rate. Considering the triangular patterns between product_category_1 vs. product_category_2, and product_category_2 vs. product_category_3 we believe the missing values are on purpose. We will keep all the missing values and will deal with them in the data processing.
 
-3. Despite the widely spread imbalanced data distribution, we didn't observe obvious target vaule differences across the categories. Therefore, we decided not to do data augmentation, data over-sampling, or any treatment. We will confirm whether to treat the imbalance issue later based on the model evaluation. 
+3. Despite the widely spread imbalanced data distribution, we didn't observe obvious target vaule differences across the categories. Therefore, we decided not to do data augmentation, data over-sampling, or any treatment. We will check again whether to treat the imbalance issue later based on the model evaluation. 
 
-4. We decided not to introduce feature interactions because the combination of 3 and 4 features can't find strong patterns. 
+4. We decided not to introduce feature interactions because the combination of 3 and 4 features can't find strong patterns to introduce. 
 
 5. The target column is slightly right-skewed. We will use square root transformation to bring it into normal distribution. In our downstream experiment, we will compare  models including linear models, tree models, and deep neural networks. Our tree-family model and DNN model have no problem with skewed input data, however, the linear model assumes the input follows a normal distribution. Therefore, we need to normalize the data. 
 
 6. Because of the implementation of some of the recommendation lib, the target can only be within [0.0, 10.0]. Accordingly, we will transfer the target into that range by using the formula:
 
-    transfered_target = sqrt(target - 3.464) / 15
+$$y_{t} = {\sqrt{y} - 3.464 \over 15}\\
+y:\ target\ value\\
+y_{t}:\ transformed\ target\ value$$
 
+There are multiple ways of normalise irregular data distributions, including log transformation, and more complicated boxcox transformation. We selected sqrt transformation because the skewness of the target wasn't too bad, thus sqrt transformation will be more suitable. After the transformation, the target data backed to normal distribution, and the range fits [0.0, 10.0]. 
+
+<p float="left">
+<img src="./images/transformed_target.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
+</p>
+    
 7. We are going to experiment with two different types of models: recommender and regression. These models require different data features. Therefore, we need to prepare data in two different ways:
     
     - recommender systems: We are going to build only use user, product, and target. They are going to deal with categorical features directly. Thus no other data processing needs to be done.
-    - regression systems: Categorical features to be transformed into numerical format. To avoid high-dimension issues and still preserve information as much as possible, we use target encoding to transform all 11 data features. Unlike label encoder or one-hot encoder that encodes the categories into integer IDs, target encoding uses statistical information to represent the categories. In our case, we use the category-grouped mean value of the target as the representative value. And we treat the missing value of the categories as a meaningful level. 
+    - regression systems: Categorical features to be transformed into numerical format. To avoid high-dimension issues and still preserve information as much as possible, we use target encoding to transform all 11 data features. Unlike label encoder or one-hot encoder that encodes the categories into integer IDs, target encoding uses statistical information to represent the categories. In our case, we use the category-grouped mean value of the target as the representative value. And we treat the missing value of the categories as a meaningful level.
+    
+    Most machine learning models can't handle categorical features directly. The categories must be encoded into numerical values. There are different ways of encoding:
+    - one-hot encoding: treating every level of category as a new column. This is the most popular encoding method, however, it is not suitable for high-cardinal categories because it created large number of dimensions. When the number of dimensions is too large, the patterns among the data points get very weak. Eventually, the model will unable to learn any information from the data. This is known as curse of high-dimension.
+    - label encoding: represent every level of category with a unique integer. This method will not create high dimension issue, however, the generated representative value may imply ordinal relationships to the target.
+    - hasing and binning: encode large number of levels into small number of buckets. These are only applicable in some special cases because when merged together, the model can't distinguish each level's pattern. 
+    - target encoding: it uses the target statistical values at each level to represent the category. The most popular representative methods are the target mean and target median. This encoding method both avoided the high-dimension issue and overcomed the problem of label-encoding. It added the connection of how the category levels related to the target values. Therefor it is a better choice in this case.  
     
 ### 3.2.3.4 Preprocessing and the data pipeline
 **Note:** The following analysis can be found in the 05-KFP_Pipeline.ipynb.
 
-The original data file, train.csv, was uploaded to the GCS bucket. 
+The original data file was manually downloaded from the Kaggle website:
+    https://www.kaggle.com/datasets/abhisingh10p14/black-friday
+
+The downloaded archive.zip file contains two csv files: train.csv and test.csv. The test.csv is for the Kaggle competition leaderboard benchmarking. It has no target values so is not relevant to our case study. We use the train.csv only. The train.csv has been manually uploaded to the GCS bucket. 
 
     DATA_URI = "gs://blackfriday_data/train.csv"
     
@@ -212,7 +231,7 @@ The first step of the data processing is to import the CSV data file into KFP Da
 
 <img src="./images/Pipeline.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
-Then, the KFP Dataset will be imported into a Pandas Dataframe. In the mean while, all data features will be cast into string data types for the downstream process to take them as categorical features.
+Then, the KFP Dataset will be imported into a Pandas Dataframe. In the mean while, all data features except the Purchase column will be cast into string data types for the downstream process to take them as categorical features.
 
 <img src="./images/dataloader.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
@@ -220,11 +239,12 @@ The Purchase values will be square root transformed, and shrank into the range o
 
 <img src="./images/transformation.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
-The transformed dataset will be split into X_train, y_train, X_test, y_test in the traintestsplit component:
+The transformed dataset will be split into X_train, y_train, X_test, y_test in the traintestsplit component. The component has been designed to take random_seed and also the proportion of test set as input parameters:
 
 <img src="./images/traintestsplit.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
-The last step of data preprocessing is to get X_train and X_test targets encoded in the target_encoding component. 
+The last step of data preprocessing is to get X_train and X_test targets encoded in the target_encoding component. This component takes  
+the X_train, y_train, and X_test as input parameters. It use y_train and X_train to fit the encoding
 
 <img src="./images/encoding.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
