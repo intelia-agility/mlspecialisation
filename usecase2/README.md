@@ -196,11 +196,11 @@ Based on the above explorative data analysis, we decided on the following approa
 
 6. Because of the implementation of some of the recommendation lib, the target can only be within [0.0, 10.0]. Accordingly, we will transfer the target into that range by using the formula:
 
-$$y_{t} = {\sqrt{y} - 3.464 \over 15}
+$$y_{t} = {\sqrt{y} - 3.464 \over 15}$$
 
-y:\ target\ value
+- $$y:\ target\ value$$
 
-y_{t}:\ transformed\ target\ value}$$
+- $$y_{t}:\ transformed\ target\ value}$$
 
 There are multiple ways of normalise irregular data distributions, including log transformation, and more complicated boxcox transformation. We selected sqrt transformation because the skewness of the target wasn't too bad, thus sqrt transformation will be more suitable. After the transformation, the target data backed to normal distribution, and the range fits [0.0, 10.0]. 
 
