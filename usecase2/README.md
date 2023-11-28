@@ -46,7 +46,7 @@ We, Intelia, confirm that all the code in this case study is original and develo
 
 ## 3.2.2 Data
 ### 3.2.2.1 Dataset in Google Cloud
-The original Black Friday Sales Prediction dataset has two data files in csv format: train.csv and test.csv. The test.csv is the private test set for the Kaggle competition leaderboard benchmarking. It doesn't have a target column, so it is of no use in this case study. Our case study is based on train.csv only.
+The original Black Friday Sales Prediction dataset has two data files in CSV format: train.csv and test.csv. The test.csv is the private test set for the Kaggle competition leaderboard benchmarking. It doesn't have a target column, so it is of no use in this case study. Our case study is based on train.csv only.
 
 - GCP project: blackfridayintelia
 Data source: gs://blackfriday_data/train.csv
@@ -55,14 +55,14 @@ Data source: gs://blackfriday_data/train.csv
 ### 3.2.3.1 Business goal and machine learning solution
 **Note:** The following analysis can be found in 01-EDA.ipynb.
 
-Sales prediction is important for several reasons. It helps businesses to allocate resources efficiently for future growth, manage cash flow and budgeting, determine sales quota and pricing policy, select distribution channels and find investors, compare actual sales with sales standards, improve pricing, advertising, and product development. From a business perspective, there are several different drivers that motivate sales prediction:
+Sales prediction is important for several reasons. It helps businesses to allocate resources efficiently for future growth, manage cash flow and budgeting, determine sales quota and pricing policy, select distribution channels and find investors, compare actual sales with sales standards, and improve pricing, advertising, and product development. From a business perspective, there are several different drivers that motivate sales prediction:
 1. To identify fast-selling products for stock-filling with the goal of reducing backorders. Or identify slow-moving products in order to reduce stale stock.
 2. To identify top buyers, with the goal of applying segmented marketing strategies.
 3. To understand personal purchasing likelihood with the goal of providing personalised recommendations.
 
-Although all of these methods fall under the category of sales prediction, they have different objectives. As a result, the solutions are not identical. Different objectives necessitate different approaches to feature selection and model training. For example, when the objective is to identify fast-selling products, individual users’ behaviour may not be a strong feature. Conversely, when the objective is to identify top buyers, we may not care about every product’s sales. Both user and product features matter only when we are tasked with predicting personalised purchases. The analysis of business goals has a significant impact on the model training process. Most machine learning models struggle when dealing with high-dimensional data. When we include either the user or the product as input features, we must be very careful about their impact on the model.
+Although all of these methods fall under the category of sales prediction, they have different objectives. As a result, the solutions are not identical. Different objectives necessitate different approaches to feature selection and model training. For example, when the objective is to identify fast-selling products, individual users’ behaviour may not be a strong feature. Conversely, we may not care about every product’s sales when the objective is to identify top buyers. Both user and product features matter only when we are tasked with predicting personalised purchases. The analysis of business goals has a significant impact on the model training process. Most machine learning models struggle when dealing with high-dimensional data. When we include either the user or the product as input features, we must be very careful about their impact on the model.
 
-The business goal of the Black Friday Sales Prediction dataset was not clearly defined. This ambiguity presents the first implicit challenge. Unfortunately, all open solutions failed to recognise the problem and jumped into the solution too early.
+The business goal of the Black Friday Sales Predictions dataset was not clearly defined. This ambiguity presents the first implicit challenge. Unfortunately, all open solutions failed to recognise the problem and jumped into the solution too early.
 
 Our analysis begins by understanding the types of analyses that the dataset can support. We start by comparing the training and test sets. It is evident that all users and products in the test set are also present in the training set. However, the combination of user and product in the test set has no intersection with the same combination in the train set.
 
@@ -72,16 +72,16 @@ Our goal is to predict the probability of users purchasing other products based 
 
 This case study aims to showcase the implementation of personalised prediction using regression technology and recommendation solutions to provide superior results. We will demonstrate that both solutions produce much better performance than all open models, based on accurate business understanding. Furthermore, we will show that the recommender model outperforms the regression model.
 
-### 3.2.3.2 Data exploration
+### 3.2.3.2 Data Exploration
 **Note:** The following analysis can be found in the 01-EDA.ipynb.
     
-A successful machine learning project must be based on a solid understanding of the data.Data exploration is an essential step in the machine-learning pipeline. It helps to identify patterns, relationships, and anomalies in the data, which can be used to improve the accuracy of the model. Data exploration also helps to identify missing values, outliers, and other data quality issues that can affect the performance of the model. By understanding the data, we can make informed decisions about which features to include in the model and which to exclude. This can help reduce overfitting and improve the generalisation performance of the model.
+A successful machine-learning project must be based on a solid understanding of the data. Data exploration is an essential step in the machine-learning pipeline. It helps to identify patterns, relationships, and anomalies in the data, which can be used to improve the accuracy of the model. Data exploration also helps to identify missing values, outliers, and other data quality issues that can affect the performance of the model. By understanding the data, we can make informed decisions about which features to include in the model and which to exclude. This can help reduce overfitting and improve the generalisation performance of the model.
 
 Exploratory data analysis (EDA) is the process of analysing and summarising the main characteristics of the data. EDA helps to identify patterns, relationships, and anomalies in the data, which can be used to improve the accuracy of the model. EDA also helps to identify missing values, outliers, and other data quality issues that can affect the performance of the model. By understanding the data, we can make informed decisions about which features to include in the model and which to exclude. This can help reduce overfitting and improve the generalisation performance of the model.
 
 There are different types of analysis during EDA:
 - univariate analysis, which profiles each individual feature. The goal is to understand the data type, missing values, and data distribution.
-- multvariate analysis, which looks into the interaction between two or even more data features. The goal is to identify how the data features are related to each other, especially their affiliation with the targe. 
+- multivariate analysis, which looks into the interaction between two or even more data features. The goal is to identify how the data features are related to each other, especially their affiliation with the target. 
 
 
 In our EDA, we use the library 'ydata-profile' to generate univariate profiling reports and bivariate profiling reports. We use plotting to analyse three-way and four-way feature interactions to identify whether any specific combination of features has an impactful correlation to the target. We also checked the data volume distribution imbalance and tried to find out whether the data imbalance has any connection to the target values.
@@ -94,7 +94,7 @@ There are 5,891 unique users and 3,631 unique products. This aligns with our ini
 
 Some of the features are presented as numerical data types. The profile shows that the user_id, occupation, marital_status, and the three product categories are all numerical. However, based on common sense, we can see that all of them should be categorical features. If we treat them as numerical features, their face values will imply ordinal relationships with the target, which is not true. For example, the expected target value of occupation 10 doesn’t necessarily increase or decrease from the expected target value of occupation 2. Therefore, we must ignore their face values and treat them all as categorical features.
 
-The Product_category_2 and Product_category_3 features have a high proportion of missing values. Especially, the rate of missing values for Product_category_3 is as high as 70%. According to general best practise, features with a high volume of missing values can be treated in several different ways. One common approach is to replace the missing values with the most frequent value in the feature. Another approach is to predict the missing values using a classifier algorithm. Or when the feature is not significant, just discard the feature. However, our analysis found that these are categorical features, and we can’t conclude whether the missing values are legitimate in business. Therefore, we treat the missing values as a default level of category.
+The Product_category_2 and Product_category_3 features have a high proportion of missing values. Especially, the rate of missing values for Product_category_3 is as high as 70%. According to general best practice, features with a high volume of missing values can be treated in several different ways. One common approach is to replace the missing values with the most frequent value in the feature. Another approach is to predict the missing values using a classifier algorithm. Or when the feature is not significant, just discard the feature. However, our analysis found that these are categorical features, and we can’t conclude whether the missing values are legitimate in business. Therefore, we treat the missing values as a default level of category.
 
 <p float="left">
 <img src="./images/profiling_0.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
@@ -102,7 +102,7 @@ The Product_category_2 and Product_category_3 features have a high proportion of
 
 2. Most data categories are imbalanced. 
 
-A typical example is the data volume of male users vs. female users. According to the profile, there are 414k male users, while the number of female users is only 136k, or less than one-third of male users. The reason for the imbalanced data distribution is unknown. In real-world project settings, it's worthwhile to dig out the reason behind the imbalanced data. Because of the nature of the business, it could be a data collection issue. We can't identify the real reason for the analysis, but the wide-spread data imbalance leads us to look into it's relation to the target values.
+A typical example is the data volume of male users vs. female users. According to the profile, there are 414k male users, while the number of female users is only 136k, or less than one-third of male users. The reason for the imbalanced data distribution is unknown. In real-world project settings, it's worthwhile to dig out the reason behind the imbalanced data. Because of the nature of the business, it could be a data collection issue. We can't identify the real reason for the analysis, but the widespread data imbalance leads us to look into its relation to the target values.
 
 <p float="left">
 <img src="./images/age.png" alt="drawing" width="261" style="border: 2px solid  gray;"/>
@@ -122,7 +122,7 @@ A typical example is the data volume of male users vs. female users. According t
 
 3. Product_Category_1 is always greater than Product_Category_2, and Product_Category_2 is always greater than Product_Category_3.
 
-Again, this is a interesting pattern. It could means something in the real business but we cannot uncover the meaning from the analysis. It is possible that the three categories are time-bounded features. For instance, product receipt time, vs. on shelf time, vs. off-shelf time. If that is really case, additional features may be built to help the models learning more patterns, for example: the latency between category_1 and category_2, or between category_2 and category_3. We can't find out the real relationships among these features so have to assume they are no logicall related.
+Again, this is an interesting pattern. It could mean something in the real business but we cannot uncover the meaning from the analysis. It is possible that the three categories are time-bounded features. For instance, product receipt time, vs. on-shelf time, vs. off-shelf time. If that is really the case, additional features may be built to help the models learn more patterns, for example: the latency between category_1 and category_2, or between category_2 and category_3. We can't find the real relationships among these features so have to assume they are not logically related.
 
 <p float="left">
 <img src="./images/pc12.png" alt="drawing" width="391" style="border: 2px solid  gray;"/>
@@ -159,9 +159,9 @@ Many linear regression models imply that the numerical features follow a normal 
 
 6. There are no significant purchasing behaviour differences related to the user features.
 
-We analysed the mean target values against all category levels and conducted a three-way analysis between age, gender, and the target values. We found that there are correlations between imbalanced categories and the target values. For example, the popular gender of male also has higher average target values. However, the difference is not significant.
+We analysed the mean target values against all category levels and conducted a three-way analysis between age, gender, and the target values. We found that there are correlations between imbalanced categories and the target values. For example, the popular gender of males also has higher average target values. However, the difference is not significant.
 
-This is a crucial aspect of data analysis. When there is a significant correlation between data imbalance and target values, we may need to apply various approaches to address it. One way is to down-sample the popular category levels, while another solution is to up-sample the unpopular category levels. We can also use other machine learning models to generate synthetic data to make the data less biassed. 
+This is a crucial aspect of data analysis. When there is a significant correlation between data imbalance and target values, we may need to apply various approaches to address it. One way is to down-sample the popular category levels, while another solution is to up-sample the unpopular category levels. We can also use other machine learning models to generate synthetic data to make the data less biased. 
 
 At this stage, we didn't find the data imbalance strongly linked to very different target values. Thus, it is not necessary to treat the imbalance issue. We'll double-check our decision with the model training outcome. If we find the trained model performs badly because of the data imbalance, we will still have to fix it.
 
@@ -179,7 +179,7 @@ At this stage, we didn't find the data imbalance strongly linked to very differe
 <img src="./images/pd7.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 </p>
 
-### 3.2.3.3 Feature engineering
+### 3.2.3.3 Feature Engineering
 **Note:** The following analysis can be found in the 01-EDA.ipynb.
     
 Based on the above explorative data analysis, we decided on the following approach in feature engineering, with the code being explained in detail in the following chapter.
@@ -202,7 +202,7 @@ $$y_{t} = {\sqrt{y} - 3.464 \over 15}$$
 
  $$y_{t}:\ transformed\ target\ value$$
 
-There are multiple ways to normalise irregular data distributions, including log transformation and the more complicated boxcox transformation. We selected sqrt transformation because the skewness of the target wasn't too bad, so sqrt transformation will be more suitable. After the transformation, the target data returned to a normal distribution, and the range fits [0.0, 10.0].
+There are multiple ways to normalise irregular data distributions, including log transformation and the more complicated box-cox transformation. We selected sqrt transformation because the skewness of the target wasn't too bad, so sqrt transformation will be more suitable. After the transformation, the target data returned to a normal distribution, and the range fits [0.0, 10.0].
 
 <p float="left">
 <img src="./images/transformed_target.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
@@ -215,8 +215,8 @@ There are multiple ways to normalise irregular data distributions, including log
     
     Most machine learning models can't handle categorical features directly. The categories must be encoded into numerical values. There are different ways of encoding:
     - one-hot encoding: treating every level of category as a new column. This is the most popular encoding method; however, it is not suitable for high-cardinal categories because it creates a large number of dimensions. When the number of dimensions is too large, the patterns among the data points get very weak. Eventually, the model will be unable to learn any information from the data. This is known as the curse of high dimensions.
-    - label encoding: represent every level of category with a unique integer. This method will not create a high-dimensional issue; however, the generated representative value may imply ordinal relationships with the target.
-    - hasing and binning: encode a large number of levels into a small number of buckets. These are only applicable in some special cases because, when merged together, the model can't distinguish each level's pattern.
+    - label encoding: represents every level of category with a unique integer. This method will not create a high-dimensional issue; however, the generated representative value may imply ordinal relationships with the target.
+    - hashing and binning: encode a large number of levels into a small number of buckets. These are only applicable in some special cases because, when merged together, the model can't distinguish each level's pattern.
     - target encoding: it uses the target statistical values at each level to represent the category. The most popular representative methods are the target mean and target median. This encoding method both avoided the high-dimension issue and overcame the problem of label encoding. It added the connection of how the category levels related to the target values. Therefore, it is a better choice in this case.
     
 ### 3.2.3.4 Preprocessing and the data pipeline
@@ -233,7 +233,7 @@ The first step in data processing is to import the CSV data file into the KFP da
 
 <img src="./images/Pipeline.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
-Then, the KFP dataset will be imported into a Pandas dataframe. In the mean time, all data features except the Purchase column will be cast into string data types for the downstream process to take them as categorical features.
+Then, the KFP dataset will be imported into a Pandas dataframe. In the meantime, all data features except the Purchase column will be cast into string data types for the downstream process to take them as categorical features.
 
 <img src="./images/dataloader.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
@@ -390,7 +390,7 @@ The pipeline has been designed to be modifiable by changing parameters like rand
     - DNN endpoint: https://console.cloud.google.com/vertex-ai/locations/us-central1/endpoints/2140390698489217024?project=blackfridayintelia&supportedpurview=project
     - XGB endpoint: https://console.cloud.google.com/vertex-ai/locations/us-central1/endpoints/334447247913648128?project=blackfridayintelia&supportedpurview=project
 
-### 3.2.4.3 Editable Model or application
+### 3.2.4.3 Editable Model or Application
 The best performant model is a PyTorch model, with two embedding inputs and one linear layer as the following:
 
 <img src="./images/DNN.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
