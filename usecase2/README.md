@@ -241,7 +241,7 @@ The purchase values will be square root transformed and shrank into the range of
 
 <img src="./images/transformation.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
-The transformed dataset will be split into X_train, y_train, X_test, y_test in the traintestsplit component. The component has been designed to take random_seed and the proportion of the test set as input parameters.
+The transformed dataset will be split into X_train, y_train, X_test, y_test in the traintestsplit component. The component has been designed to take random_seed and the proportion of the test set as input parameters. In this experiment, we set the size of test set to be 0.25. That means that we use 75% of the whole data set to train the model and the rest 25% as the test set. 
 
 <img src="./images/traintestsplit.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
@@ -254,9 +254,13 @@ the X_train, y_train, and X_test as input parameters. It uses y_train and X_trai
 ####  Regressional Solutions
 **Note:** The following analysis can be found in the 02-Regression_Models.ipynb.
     
-Based on the same preprocessed data features, we compared the performance of three regular regression models: Linear Regressor, XGB Regressor, and LightGB Regressor. We use the RMSE of the scaled target value as the main metric and calculate the RMSE on the original target values to make it easier to understand. 
+Based on the same preprocessed data features, we compared the performance of three regular regression models: Linear Regressor, XGB Regressor, and LightGB Regressor. We chose Linear Regressor as one of the baseline model because linear is a simple and stable model. Its learned parameters is easy to explain. We chose XGBoost and LightGB because both of them are proven very efficient model. Both of them are tree-based models. They are easy to train and they have built-in feature importance evaluation functions. 
 
-The code and performance are as follows:
+This case study is a prediction task. For prediction tasks, we are more interested in predicting the accurate mean values instead of median or other target values. There are two popular metrics for mean value prediction tasks: MSE and RMSE. We chose RMSE because it can maintain the scale of the error at the same level of the target values, so that the result is more intuitive. 
+
+Because we down-scaled our training data during model training, we calculate two RMSE metrics: the first one was based on the down-scaled target value as the main metric, and the other was based on the original target values to make it easier to understand. 
+
+The code of the model training and their performance are as follows:
 
 - Linear Regressor
 
@@ -270,26 +274,30 @@ The code and performance are as follows:
 
 <img src="./images/lgbm.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
-As it turned out, XGB Regressor is the best performer of the three models. Its scaled RMSE was 0.8846, while the original target RMSE was 2522.13, which outperformed most of the open analyses. 
+In conclusion, XGB Regressor is the best performer of the three models. Its down-scaled RMSE was 0.8846, while the original target RMSE was 2522.13, which outperformed most of the open analyses. 
 
 The feature importance chart of the XGB Regressor model is:
 
 <img src="./images/xgb_imp.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
-From the chart, we can see that user_id and product_id were the top two strongest features. That justified our decision to include user_id and product_id by target_encoding. 
+From the chart we can see that user_id and product_id were the top two strongest features. That justified our decision of including user_id and product_id by target_encoding. 
 
 ####  Recommendation Solutions
 **Note:** The following analysis can be found in the 03-Recommendation-FastAI.ipynb and 03-Recommendation-Surprise.ipynb.
 
-There are different implementations of recommendation systems. For instance, KNN, Matrix Decomposition, Collaborative Filter, and DNN. In this case study, we compared two technologies:
+In our regression model experiment, we have demonstrated that by utilising proper category encoding technique we can prodict more accurate result. This solution has it own limit. For category level with similar mean target values, the model has trouble to distinguish each other, therefor unable to uncover more accurate personal purchase predictions. In order to overcome this limitation, we have to use [recommendor system](https://en.wikipedia.org/wiki/Recommender_system) which was specialised on this purpose. 
+
+The recommender systems look at the challenge from a different angle. Typical recommender systems only learn patterns based on three data features: user, item, and rating. The modern recommender system was developed in a movie recommendation competition. Since then the feature names were inherited. And even the rating was inherited as in the range of [0.0, 10.0]. In our case the user is the user_id, item is product_id, and the rating is the transformed and downscalled purchase.  
+
+There are different implementations of recommendation systems. For instance, [KNN](https://surprise.readthedocs.io/en/stable/knn_inspired.html), [Matrix Decomposition](https://surprise.readthedocs.io/en/stable/matrix_factorization.html), [Collaborative Filtering](https://surprise.readthedocs.io/en/stable/slope_one.html), and [DNN](https://docs.fast.ai/collab.html#create-a-learner). In this case study, we compared two technologies:
 
 - SVD
 
-SVD stands for Singular Values Decomposition. Essentially, it treats the interaction of the user, product, and purchase as a huge two-dimensional matrix, with the user as one dimension and the product as another dimension. The cell values represent the purchases that the user has made for that product. The algorithm will use either user-to-user similarity or product-to-product similarity to predict a user's purchase of the new product. The huge user-product matrix is a very sparse, high-cardinal data structure that is hard to compute. SVD decomposes it into three low-rank matrices to enable the computation:
+SVD stands for Singular Values Decomposition. It treats the interaction of the user, product, and purchase as a huge two-dimensional matrix, with the user as one dimension and the product as another dimension. The cell values represent the purchases that the user has made for that product. The algorithm will use either user-to-user similarity or product-to-product similarity to predict a user's purchase of the new product. The huge user-product matrix is a very sparse, high-cardinal data structure that is hard to compute. SVD decomposes it into three low-rank matrices to enable the computation:
 
 <img src="./images/SVD.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
-We implemented the SVD with the Surprise recommendation framework and we compared the performance of several other implementations, for example, KNN, NMF, Collaborative Filter, etc. We found the SVD performs better than other technologies. 
+We implemented the SVD with the Surprise recommendation framework and we compared the performance of several other implementations, for example, KNN, NMF, Collaborative Filter, etc. We found the SVD performs better than other technologies. In the following code, we trained a SVD model with 100 factors. 
 
 <img src="./images/surprise_svd.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
@@ -297,9 +305,11 @@ We can see that the SVD model produced a scaled RMSE of 0.8876, which is very cl
 
 - Deep Learning
 
-In the above SVD technology, the high-cardinal user and product features were decomposed into low-ranking matrices. This operation can also be interpreted as encoding the user and product features into low-ranking embeddings. Thus, the embeddings can represent inherent similarities between users and products. Then we can use generic deep learning technology to learn the interaction between the user and the product. In our implementation, we use FastAI collab_learner, which is a Pytorch-based basic recommendation model. The model structure is as follows:
+In the above SVD technology, the high-cardinal user and product features were decomposed into low-rank matrices. This operation can also be interpreted as encoding the user and product features into low-rank embeddings. Thus, the embeddings can represent inherent similarities between users and products. Then we can use generic deep learning technology to learn the interaction between the user and the product. In our implementation, we use FastAI collab_learner, which is a Pytorch-based ready-to-use basic recommendation model. The model structure is as follows:
 
 <img src="./images/DNN.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
+
+The FastAI framework did the category encoding behind the scene. It converts the input user_id and product_id into one-hot-encoded arrays before it passes the input to the DNN model. The model learned an embedding for each of the user_id and product_id input. The defualt embedding size for product_id was 157, and 207 for user_id. Above the embedding layer, there is a single fully connected middle layer, and top layer. It uses sigmoid as the final activation function and uses batch_normal and RELU in the middle layer. Optionally, it can trun on dropout to control overfitting. 
 
 When running on the notebook, the deep learning model achieved a scaled RMSE of 0.8624, which is significantly better than the XGB Regressor.
 
@@ -435,3 +445,7 @@ The case study didn't go deeper to get the best performance because of time and 
 
 ### Recommender System
     https://en.wikipedia.org/wiki/Recommender_system
+    https://surprise.readthedocs.io/en/stable/knn_inspired.html
+    https://surprise.readthedocs.io/en/stable/matrix_factorization.html
+    https://surprise.readthedocs.io/en/stable/slope_one.html
+    https://docs.fast.ai/collab.html#create-a-learner
