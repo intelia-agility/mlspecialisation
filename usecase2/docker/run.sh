@@ -1,0 +1,1 @@
+gcloud builds submit --region=us-central1 --tag us-central1-docker.pkg.dev/blackfridayintelia/quickstart-docker-repo/fastai_prediction
