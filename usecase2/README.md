@@ -318,43 +318,68 @@ When running on the notebook, the deep learning model achieved a scaled RMSE of 
 ### 3.2.3.6 Machine learning model training and development
 **Note:** The following analysis can be found in the [05-KFP_Pipeline.ipynb](html/05-KFP_Pipeline.html).
 
-<<<<<<< HEAD
-- Hyperparameter tunning
+The best-performing model is the DNN model trained using FastAI collab_learner. In order to control overfitting, the original data has been slipped into 75% as the train set and 25% as the test set. The model will be trained on the training set and evaluated using scaled RMSE and original RMSE on the test set. Unlike many other deep learning frameworks that use a fixed or decreasing learning rate, FastAI uses a cyclic learning rate to make the model training converge faster. To make sure the result is reproducible, we set the random_seed before model training. We have a constraint to minimise the training cost; therefore, we didn't use a GPU. The DNN model training took 10 minutes to complete.
 
-Both our base recommender and XGBoost models have surpassed all open Black Friday models. Before we deploy these models into production, it's important to fine-tune the model hyper parameters to achieve the best prediction performance.  
-- Deployed models
+Both our base recommender and XGBoost models have surpassed all open Black Friday models. Before we deploy these models into production, it's important to fine-tune the model hyper parameters to achieve additional prediction performance with low effort. Hyperparameter tuning normally requires running multiple similar model training tasks with different settings, and choose the best settings which produce the best performance. Hyperparameter tuning can be costly when the dataset is very large and the model training is very expensive or time consuming. In that case, the hyperparameter tuning may run on a subset of the training data to cut the cost. In our case, we use the full training dataset because it size is acceptable. 
 
-The best-performing model is the DNN model trained using FastAI collab_learner. In order to control overfitting, the original data has been slipped into 75% as the train set and 25% as the test set. The model will be trained on the training set and evaluated using scaled RMSE and original RMSE on the test set. Unlike many other deep learning frameworks that use a fixed or decreasing learning rate, FastAI uses a cyclic learning rate to make the model training converge faster.
-=======
-The best-performing model is the DNN model trained using FastAI collab_learner. To control overfitting, the original data has been slipped into 75% as the train set and 25% as the test set. The model will be trained on the training set and evaluated using scaled RMSE and original RMSE on the test set. Unlike many other deep learning frameworks that use a fixed or decreasing learning rate, FastAI uses a cyclic learning rate to make the model training converge faster.
->>>>>>> 05f4e4b2c03cdbb761bd5ec18d14fef67a8a483f
+We chose two different models, XGBoost and Pytorch + FastAI. They require different ways to tune. Because of its popularity, the XGB model is widely supported. The hyperparameter tuning for XGBoost model is by using the Scikit-Learn RandomizedSearchCV function:
 
-We have a constraint to minimise the training cost; therefore, we didn't use a GPU. The DNN model training took 10 minutes to complete. To reduce the cost, we used a simplified version of grid search to optimise the DNN performance. We ran several experiments to select the best-performing model by changing the most important hyperparameter, n_factors, which is the size of the depth of the DNN fully connected layer. We found that the optimal number was 160.
+> xgb_hpt = RandomizedSearchCV(xgb1,
+                        parameters,
+                        scoring='neg_mean_squared_error',
+                        cv = 5,
+                        n_jobs = 7,
+                        n_iter = n_iter,
+                        verbose=True)
 
-To make sure the result is reproducible, we set the random_seed before model training.
+And the set of hyperparameters was:
+
+>     parameters = { 
+                  'objective':['reg:squarederror'],
+                  # 'learning_rate': [0.045,0.05,0.06], 
+                  'max_depth': [4,5,6],
+                  'min_child_weight': [1,2,3],
+                  'subsample': [0.5,0.7, 1],
+                  'colsample_bytree': [0.8,0.9, 1],
+                  'n_estimators': [650,750,800]
+                 }
+                 
+There're variant types of hyperparameter tuning strategies. One popular way is grid search, which means experiment all the combinations of all hyperparameters. Another popular way is random search, which means only try a fixed number of hyperparameter combinations. In our case we chose randomsearch because it can guarantee finishing the tasks within fixed time box. This is important because we have limited budget on the computation, and we don't have too much time to wait for the result. The drawback of random search is that it is not exhausive, which means that in theory, random search may miss the best parameter set. In practice, random search has been proven to be efficient. In our case study, after tried 20 iterations, the best model produced scaled RMSE of 0.8752, which a big jump ahead from the base XGBoost model's scaled RMSE of 0.8776.  
 
 The deployed XGB model training is in the train_xgb component:
 
-<img src="./images/train_xgb.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
+<img src="./images/hpt_xgb.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
+
+The hyperparameter tuning process for our DNN model is much tricker. The model relies on FastAI to provide essential data processing. Despite FastAI is a very innovative in model training, it doesn't have full ranged supporting ecosystem. Hyperparameter tuning is just one of the missing puzzles. To implement hyperparameter tuning for our DNN recommender model, we have implemented a random search structure:
+
+<img src="./images/random_search.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
+
+The idea is randomly select n set of combinations of input hyperparameters, experiment model training with each of these hyper parameter sets, and select the best performer. The parameters I chose was:
+
+> parameters = {'n_factors': [140, 160, 180, 200, 250],
+             'lr_max': [1e-3, 5e-3, 2e-2],
+             'wd':[0.6, 0.7, 0.8]}
+             
+Same as the hyperparameter-tuned XGB model, the DNN recommendor model achieved scaled RMSE of 0.8593, which is notiblly better than the base DNN model's scaled RMSE of 0.8624. 
 
 The deployed DNN Pytorch model training is in the train_dnn component:
 
-<img src="./images/train_dnn.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
+<img src="./images/random_search_main.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
 
 ### 3.2.3.7 Machine learning model evaluation
 **Note:** The following analyses can be found in the [02-Regression_Models.ipynb](html/02-Regression_Models.html) and [03-Recommendation-FastAI.ipynb](html/03-Recommendation-FastAI.html).
     
-So far, the best DNN model has achieved a scaled RMSE of 0.8624, while the best regression model, XGB Regressor, has achieved 0.8846. The difference seems not to be significant. Let's see what the results look like.
+So far, the best DNN model has achieved a scaled RMSE of 0.8593, while the best regression model, XGB Regressor, has achieved 0.8846. The difference seems not to be significant. Let's compare the result side by side.
 
 <p float="left">
 <img src="./images/xgb_result.png" alt="drawing" width="388" style="border: 2px solid  gray;"/>
 <img src="./images/DNN_result.png" alt="drawing" width="397" style="border: 2px solid  gray;"/>
 </p>
 
-As it turned out, the models overestimate for low target values and underestimate for high target values. And the DNN model result is slightly closer to the diagonal line. That means the DNN model made fewer mistakes for both low target values and high target values.
+In general, the models overestimate for low target values and underestimate for high target values. The difference between these two plots is subtle, but the DNN model result is slightly closer to the diagonal line. That means the DNN model made fewer mistakes for both low target values and high target values.
 
-A residual analysis has been done to spot whether there are any imbalanced errors. As it turned out, imbalanced errors do exist but are not very significant. The imbalanced performance is closely related to the imbalanced data distribution. One approach to fixing the problem is oversampling the unpopular categories or generating synthetic data. We chose not to augment the data because the performance differences are not too bad.
+A residual analysis has been done to spot whether there are any imbalanced errors. We found that imbalanced errors do exist but are not very significant. The imbalanced performance is closely related to the imbalanced data distribution. To remedy the imbalanced data issue, options include oversampling the unpopular categories, downsampleing the popular group, or generating synthetic data. While they can help the imbalanced data when used carefully, all those methods have a potential risk that if go too far, the statistical boundary between groups may be different between the training data and the test data, thus causing over-fiting. Based on our after-training evalution, impact of the imbalanced data is not significant and the impact is evenly spreaded, so we don't have to fix it.
 
 <img src="./images/resid.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
@@ -369,7 +394,9 @@ The importance plot shows that user_id and product_id are still the strongest fe
 
 <img src="./images/fr_imp.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
-When we compare the ground truth values, best XGB model predictions, and fair model predictions, we find that in the vast majority of cases, the fair model slightly performs worse than the XGB model. There are also scenarios where the inclusion of demographic features makes performance worse. One of the examples is that including demographic features makes a better prediction for females but makes a worse prediction for males. 
+When we compare the ground truth values, best XGB model predictions, and fair model predictions, we find that in the vast majority of cases, the gap between the fair model and the full-feature model are not significant, which aligns our feature importance analysis that the demographic features are not important features. Despite the fair model performs slightly worse in majority groups, there are also scenarios where the inclusion of demographic features makes performance worse. One of the examples is that including demographic features makes a better prediction for females but makes a worse prediction for males. 
+
+In real-world projects, the criterias of fairness should be decided by business stake holders. In the case of including demographic features making higher prediction for femails but less for males, it must be evaluated under certain business context to decide whether it is fair or unfair.
 
 <img src="./images/fr_compare.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
@@ -381,7 +408,7 @@ We analysed the RMSE distribution at all the categorical levels and found that t
 
 <img src="./images/residual.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
-Based on the above analysis, we concluded that the inclusion of the demographic features didn't cause significant unfair predictions. However, the definition of fairness can be domain-specific. In a real-world project, we need to highlight the subtle differences caused by including demographic features and let the business stakeholders decide whether the result is fair or unfair.
+Based on the above analysis, we concluded that the inclusion of the demographic features didn't cause significant unfair predictions. However, this is purely based on technical observation, but the definition of fairness can be domain-specific. In a real-world project, we need to highlight the subtle differences caused by including demographic features and let the business stakeholders decide whether the result is fair or unfair.
 
 ## 3.2.4 Deployment
 **Note:** The following analysis can be found in the [05-KFP_Pipeline.ipynb](html/05-KFP_Pipeline.html).
@@ -399,7 +426,27 @@ As depicted above, the Vertex pipeline was composed of the whole process of the 
 8. create two endpoints
 9. deploy both the two models to their endpoint
 
-The pipeline has been designed to be modifiable by changing parameters like random_seed, train-test split ratio, etc. Both the scaled RMSE and the original RMSE were published as the result of the model training. 
+Both the trained XGBoost model and the FastAI DNN recommendor model need to run in a docker container. Vertex AI has built-in prediction image for XGBoost model deployment, and it works with no problem. The FastAI DNN recommender model doesn't has a built-in prediction image to choose.  
+
+The pipeline has been designed to be modifiable by changing parameters like random_seed, train-test split ratio, etc. Both the scaled RMSE and the original RMSE were published as the result of the model training. We have built a custom prediction image to support this model. We built a two-stage image, the first stage is the installation of Python libraries:
+
+>FROM python:3.9
+ENV AIP_STORAGE_URI=default
+WORKDIR /app
+COPY . /app
+RUN pip install --upgrade pip
+RUN pip install -r /app/requirements.txt
+
+The second and final stage install the payload script:
+
+>FROM us-central1-docker.pkg.dev/blackfridayintelia/quickstart-docker-repo/fastai_0
+WORKDIR /app
+COPY . /app
+RUN echo "The AIP_STORAGE_URI is $AIP_STORAGE_URI"
+ENTRYPOINT gunicorn -b :5080 app:app --timeout 60
+
+The payload was:
+>
 
 ### 3.2.4.1 Model or application on Google Cloud
 - Vertex pipeline: https://console.cloud.google.com/vertex-ai/locations/us-central1/pipelines/runs/blackfriday-pipeline-v0-20231205035105?project=blackfridayintelia
