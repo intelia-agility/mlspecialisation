@@ -285,7 +285,7 @@ The feature importance chart of the XGB Regressor model is:
 From the chart we can see that user_id and product_id were the top two strongest features. That justified our decision of including user_id and product_id by target_encoding. 
 
 ####  Recommendation Solutions
-**Note:** The following analysis can be found in the [03-Recommendation-FastAI.ipynb](html/03-Recommendation-FastAI.html) and [04-Recommendation-Surprise.ipynb](html/03-Recommendation-FastAI.html).
+**Note:** The following analysis can be found in the [03-Recommendation-FastAI.ipynb](html/03-Recommendation-FastAI.html) and [04-Recommendation-Surprise.ipynb](html/04-Recommendation-Surprise.html).
 
 In our regression model experiment, we have demonstrated that by utilising proper category encoding technique we can prodict more accurate result. This solution has it own limit. For category level with similar mean target values, the model has trouble to distinguish each other, therefor unable to uncover more accurate personal purchase predictions. In order to overcome this limitation, we have to use [recommendor system](https://en.wikipedia.org/wiki/Recommender_system) which was specialised on this purpose. 
 
@@ -318,6 +318,11 @@ When running on the notebook, the deep learning model achieved a scaled RMSE of 
 ### 3.2.3.6 Machine learning model training and development
 **Note:** The following analysis can be found in the [05-KFP_Pipeline.ipynb](html/05-KFP_Pipeline.html).
 
+- Hyperparameter tunning
+
+Both our base recommender and XGBoost models have surpassed all open Black Friday models. Before we deploy these models into production, it's important to fine-tune the model hyper parameters to achieve the best prediction performance.  
+- Deployed models
+
 The best-performing model is the DNN model trained using FastAI collab_learner. In order to control overfitting, the original data has been slipped into 75% as the train set and 25% as the test set. The model will be trained on the training set and evaluated using scaled RMSE and original RMSE on the test set. Unlike many other deep learning frameworks that use a fixed or decreasing learning rate, FastAI uses a cyclic learning rate to make the model training converge faster.
 
 We have a constraint to minimise the training cost; therefore, we didn't use a GPU. The DNN model training took 10 minutes to complete. To reduce the cost, we used a simplified version of grid search to optimise the DNN performance. We ran several experiments to select the best-performing model by changing the most important hyperparameter, n_factors, which is the size of the depth of the DNN fully connected layer. We found that the optimal number was 160.
@@ -331,6 +336,7 @@ The deployed XGB model training is in the train_xgb component:
 The deployed DNN Pytorch model training is in the train_dnn component:
 
 <img src="./images/train_dnn.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
+
 
 ### 3.2.3.7 Machine learning model evaluation
 **Note:** The following analyses can be found in the [02-Regression_Models.ipynb](html/02-Regression_Models.html) and [03-Recommendation-FastAI.ipynb](html/03-Recommendation-FastAI.html).
