@@ -324,7 +324,7 @@ Both our base recommender and XGBoost models have surpassed all open Black Frida
 
 We chose two different models, XGBoost and Pytorch + FastAI. They require different ways to tune. Because of its popularity, the XGB model is widely supported. The hyperparameter tuning for the XGBoost model is by using the Scikit-Learn RandomizedSearchCV function:
 
-> xgb_hpt = RandomizedSearchCV(xgb1,
+        xgb_hpt = RandomizedSearchCV(xgb1,
                         parameters,
                         scoring='neg_mean_squared_error',
                         cv = 5,
@@ -334,7 +334,7 @@ We chose two different models, XGBoost and Pytorch + FastAI. They require differ
 
 And the set of hyperparameters was:
 
->     parameters = { 
+        parameters = { 
                   'objective':['reg:squarederror'],
                   # 'learning_rate': [0.045,0.05,0.06], 
                   'max_depth': [4,5,6],
@@ -356,9 +356,9 @@ The hyperparameter tuning process for our DNN model is much tricker. The model r
 
 The idea is to randomly select n set of combinations of input hyperparameters, experiment model training with each of these hyperparameter sets, and select the best performer. The parameters I chose were:
 
-> parameters = {'n_factors': [140, 160, 180, 200, 250],
-             'lr_max': [1e-3, 5e-3, 2e-2],
-             'wd':[0.6, 0.7, 0.8]}
+        parameters = {'n_factors': [140, 160, 180, 200, 250],
+                 'lr_max': [1e-3, 5e-3, 2e-2],
+                 'wd':[0.6, 0.7, 0.8]}
              
 Same as the hyperparameter-tuned XGB model, the DNN recommender model achieved a scaled RMSE of 0.8593, which is notably better than the base DNN model's scaled RMSE of 0.8624. 
 
@@ -430,20 +430,20 @@ Both the trained XGBoost model and the FastAI DNN recommender model need to run 
 
 The pipeline has been designed to be modifiable by changing parameters like random_seed, train-test split ratio, etc. Both the scaled RMSE and the original RMSE were published as the result of the model training. We have built a custom prediction image to support this model. We built a two-stage image, the first stage is the installation of Python libraries:
 
->FROM python:3.9
-ENV AIP_STORAGE_URI=default
-WORKDIR /app
-COPY . /app
-RUN pip install --upgrade pip
-RUN pip install -r /app/requirements.txt
+        FROM python:3.9
+        ENV AIP_STORAGE_URI=default
+        WORKDIR /app
+        COPY . /app
+        RUN pip install --upgrade pip
+        RUN pip install -r /app/requirements.txt
 
 The second and final stage install the payload script:
 
->FROM us-central1-docker.pkg.dev/blackfridayintelia/quickstart-docker-repo/fastai_0
-WORKDIR /app
-COPY . /app
-RUN echo "The AIP_STORAGE_URI is $AIP_STORAGE_URI"
-ENTRYPOINT gunicorn -b :5080 app:app --timeout 60
+        FROM us-central1-docker.pkg.dev/blackfridayintelia/quickstart-docker-repo/fastai_0
+        WORKDIR /app
+        COPY . /app
+        RUN echo "The AIP_STORAGE_URI is $AIP_STORAGE_URI"
+        ENTRYPOINT gunicorn -b :5080 app:app --timeout 60
 
 The payload was:
 >
