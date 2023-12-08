@@ -194,7 +194,7 @@ Based on the above explorative data analysis, we decided on the following approa
 
 4. We decided not to introduce feature interactions because the combination of 3 and 4 features couldn't find strong patterns to introduce. 
 
-5. The target column is slightly right-skewed. We will use the square root transformation to bring it into normal distribution. In our downstream experiment, we will compare models including linear models, tree models, and deep neural networks. Our tree-family model and DNN model have no problem with skewed input data; however, the linear model assumes the input follows a normal distribution. Therefore, we need to normalise the data.
+5. The target column is slightly right-skewed. We will use the square root transformation to bring it into a normal distribution. In our downstream experiment, we will compare models including linear models, tree models, and deep neural networks. Our tree-family model and DNN model have no problem with skewed input data; however, the linear model assumes the input follows a normal distribution. Therefore, we need to normalise the data.
 
 6. Because of the implementation of some of the recommendation libraries, the target can only be within [0.0, 10.0]. Accordingly, we will transfer the target into that range by using the formula:
 
@@ -449,7 +449,7 @@ The payload was:
 
 <img src="./images/docker.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
-The payload download the FastAI learner model file from GCS, then instantiate the learner. It serves predict and health-check requests on a flask webapp according to Vertex AI's custom prediction container spec. 
+The payload downloads the FastAI learner model file from GCS, and then instantiates the learner. It serves predict and health-check requests on a flask web app according to Vertex AI's custom prediction container spec. 
 
 ### 3.2.4.1 Model or application on Google Cloud
 - Vertex pipeline: https://console.cloud.google.com/vertex-ai/locations/us-central1/pipelines/runs/blackfriday-pipeline-v0-20231205035105?project=blackfridayintelia
@@ -466,7 +466,7 @@ The payload download the FastAI learner model file from GCS, then instantiate th
 
 <img src="./images/endpoints.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
-The XGB model and the DNN recommender require different type of input information for prediction. The XGB model requires all the 11 target_encoded features, while DNN recommender only needs the user_id and product_id features in string format. Both the two models produce scaled purchase prediction in the range of [0.0, 10.0]. 
+The XGB model and the DNN recommender require different types of input information for prediction. The XGB model requires all the 11 target_encoded features, while DNN recommender only needs the user_id and product_id features in string format. Both models produce scaled purchase prediction in the range of [0.0, 10.0]. 
 
 This is the sample request for the XGB model online prediction:
 
@@ -503,7 +503,7 @@ The sample request for the DNN recommender online prediction is:
           ]
         }
         
-The recommender model requires only the raw formated user_id and product_id. It produces the same format of result:
+The recommender model requires only the raw formatted user_id and product_id. It produces the same format of result:
 
 <img src="./images/DNN_prediction.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
@@ -529,7 +529,7 @@ Compared to the most openly available Black Friday analysis, this case study pro
 The case study didn't dive deep to get the best performance because of time and budget constraints. Things to consider in further performance enhancement are:
 1. Deep learning outperforms all other models. It only uses the user_id and product_id. It is worth including the embedding of other features
 2. The DNN model only has one fully connected layer. Probably, performance can increase with a more sophisticated model
-3. The best performing recomender system has a inherent limitation: all the user and item must pre-exist in the training data, and there must be at least certain level interactions in history. Otherwise, the model can't find any pattern. This is called cold-start problem because the solution can't deal with new user and new item. We didn't touch how to solve the cold-start problem in this case study. The general solution is to use two models so that when the user and item are new to the system, the solution falls back to general prediction model.  
+3. The best-performing recommender system has an inherent limitation: all the users and items must pre-exist in the training data, and there must be at least certain level interactions in history. Otherwise, the model can't find any pattern. This is called the cold-start problem because the solution can't deal with new users and new items. We didn't touch on how to solve the cold-start problem in this case study. The general solution is to use two models so that when the user and item are new to the system, the solution falls back to the general prediction model.  
 
 
 ## Resources
