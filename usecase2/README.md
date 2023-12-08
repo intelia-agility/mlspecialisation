@@ -8,7 +8,7 @@ The Black Friday Kaggle dataset is a six-year-old dataset with over 31,000 downl
 
 <img src="./images/kaggle_BF.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
-Despite the popularity of the Kaggle Black Friday Prediction dataset, many open analyses failed to consider the business requirements adequately, leading to underperforming results. Our case study revealed that the dataset’s purpose is to generate personalised predictions for individual users and products, rather than a generic regression task. Based on the business requirements understanding, we developed both a personalised prediction regression model and a recommendation system. We demonstrated that by properly comprehending the business requirements, we can produce high-quality work in feature engineering, model selection, evaluation, and superior prediction accuracy. Finally, we showcased our model development process on Vertex AI.
+Despite the popularity of the Kaggle Black Friday Prediction dataset, many open analyses failed to consider the business requirements adequately, leading to underperforming results. Our case study revealed that the dataset’s purpose is to generate personalised predictions for individual users and products, rather than a generic regression task. Based on our understanding of the business requirements, we developed both a personalised prediction regression model and a recommendation system. We demonstrated that by properly comprehending the business requirements, we can produce high-quality work in feature engineering, model selection, evaluation, and superior prediction accuracy. Finally, we showcased our model development process on Vertex AI.
 
 # Table of Content
 - [3.2.1 Code](#321-code)
@@ -46,7 +46,7 @@ We, Intelia, confirm that all the code in this case study is original and develo
 
 ## 3.2.2 Data
 ### 3.2.2.1 Dataset in Google Cloud
-The original Black Friday Sales Prediction dataset has two data files in CSV format: train.csv and test.csv. The test.csv is the private test set for the Kaggle competition leaderboard benchmarking. It doesn't have a target column, so it is of no use in this case study. Our case study is based on train.csv only. The original train.csv and also test.csv have been ingested into BigQuery for EDA only. The Vertex model training pipeline directly reads the train.csv from GCS.
+The original Black Friday Sales Prediction dataset has two data files in CSV format: train.csv and test.csv. The test.csv is the private test set for the Kaggle competition leaderboard benchmarking. It doesn't have a target column, so it is of no use in this case study. Our case study is based on train.csv only. The original train.csv and test.csv have been ingested into BigQuery for EDA only. The Vertex model training pipeline directly reads the train.csv from GCS.
 
 - GCP project: blackfridayintelia
 - Data source: gs://blackfriday_data/train.csv
@@ -57,16 +57,16 @@ The original Black Friday Sales Prediction dataset has two data files in CSV for
 ### 3.2.3.1 Business goal and machine learning solution
 **Note:** The following analysis can be found in [01-EDA.ipynb](html/01-EDA.html).
 
-Sales prediction is important for several reasons. It helps businesses to allocate resources efficiently for future growth, manage cash flow and budgeting, determine sales and pricing policy, select distribution channels and find investors, compare actual sales with sales standards, and improve pricing, advertising, and product development. From a business perspective, there are several different drivers that motivate sales prediction:
-1. To identify fast-selling products for stock-filling with the goal of reducing backorders. Or identify slow-moving products in order to reduce stale stock.
-2. To identify top buyers, with the goal of applying segmented marketing strategies.
-3. To understand personal purchasing likelihood with the goal of providing personalised recommendations.
+Sales prediction is important for several reasons. It helps businesses to allocate resources efficiently for future growth, manage cash flow and budgeting, determine sales and pricing policy, select distribution channels and find investors, compare actual sales with sales standards, and improve pricing, advertising, and product development. From a business perspective, several different drivers motivate sales prediction:
+1. To identify fast-selling products for stock-filling to reduce backorders. Or identify slow-moving products to reduce stale stock.
+2. To identify top buyers, to apply segmented marketing strategies.
+3. To understand personal purchasing likelihood to provide personalised recommendations.
 
-Although all of these methods fall under the category of sales prediction, they have different objectives. As a result, the solutions are not identical. Different objectives necessitate different approaches to feature selection and model training. For example, when the objective is to identify fast-selling products, individual users’ behaviour may not be a strong feature. Conversely, we may not care about every product’s sales when the objective is to identify top buyers. Both user and product features matter only when we are tasked with predicting personalised purchases. The analysis of business goals has a significant impact on the model training process. Most machine learning models struggle when dealing with high-dimensional data. When we include either the user or the product as input features, we must be very careful about their impact on the model.
+Although all of these methods fall under the category of sales prediction, they have different objectives. As a result, the solutions are not identical. Different objectives necessitate different approaches to feature selection and model training. For example, when the objective is to identify fast-selling products, individual users’ behaviour may not be a strong feature. Conversely, we may not care about every product’s sales when the objective is to identify top buyers. Both user and product features matter only when we are tasked with predicting personalised purchases. The analysis of business goals has a significant impact on the model training process. Most machine learning models struggle when dealing with high-dimensional data. When we include either the user or the product as input features, we must be careful about their impact on the model.
 
 The business goal of the Black Friday Sales Predictions dataset was not clearly defined. This ambiguity presents the first implicit challenge. Unfortunately, all open solutions failed to recognise the problem and jumped into the solution too early.
 
-Our analysis begins by understanding the types of analyses that the dataset can support. We start by comparing the training and test sets. It is evident that all users and products in the test set are also present in the training set. However, the combination of user and product in the test set has no intersection with the same combination in the train set.
+Our analysis begins by understanding the types of analyses that the dataset can support. We start by comparing the training and test sets. All users and products in the test set are also present in the training set. However, the combination of user and product in the test set has no intersection with the same combination in the train set.
 
 <img src="./images/goal_analysis.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
@@ -77,12 +77,12 @@ This case study aims to showcase the implementation of personalised prediction u
 ### 3.2.3.2 Data Exploration
 **Note:** The following analysis can be found in the [01-EDA.ipynb](html/01-EDA.html).
     
-A successful machine-learning project must be based on a solid understanding of the data. Data exploration is an essential step in the machine-learning pipeline. It helps to identify patterns, relationships, and anomalies in the data, which can be used to improve the accuracy of the model. Data exploration also helps to identify missing values, outliers, and other data quality issues that can affect the performance of the model. By understanding the data, we can make informed decisions about which features to include in the model and which to exclude. This can help reduce overfitting and improve the generalisation performance of the model.
+A successful machine-learning project must be based on a solid understanding of the data. Data exploration is an essential step in the machine-learning pipeline. It helps to identify patterns, relationships, and anomalies in the data, which can be used to improve the accuracy of the model. Data exploration also helps to identify missing values, outliers, and other data quality issues that can affect the model's performance. By understanding the data, we can make informed decisions about which features to include in the model and which to exclude. This can help reduce overfitting and improve the generalisation performance of the model.
 
-Exploratory data analysis (EDA) is the process of analysing and summarising the main characteristics of the data. EDA helps to identify patterns, relationships, and anomalies in the data, which can be used to improve the accuracy of the model. EDA also helps to identify missing values, outliers, and other data quality issues that can affect the performance of the model. By understanding the data, we can make informed decisions about which features to include in the model and which to exclude. This can help reduce overfitting and improve the generalisation performance of the model.
+Exploratory data analysis (EDA) is the process of analysing and summarising the main characteristics of the data. EDA helps to identify patterns, relationships, and anomalies in the data, which can be used to improve the accuracy of the model. EDA also helps to identify missing values, outliers, and other data quality issues that can affect the model's performance. By understanding the data, we can make informed decisions about which features to include in the model and which to exclude. This can help reduce overfitting and improve the generalisation performance of the model.
 
 There are different types of analysis during EDA:
-- univariate analysis, which profiles each individual feature. The goal is to understand the data type, missing values, and data distribution.
+- univariate analysis, which profiles each feature. The goal is to understand the data type, missing values, and data distribution.
 - multivariate analysis, which looks into the interaction between two or even more data features. The goal is to identify how the data features are related to each other, especially their affiliation with the target. The insights developed in the multivariate analysis will be important in feature engineering, or providing the training data in such a way that the desirable patterns will be clearer to identify. 
 
 
@@ -124,7 +124,7 @@ A typical example is the data volume of male users vs. female users. According t
 
 3. Product_Category_1 is always greater than Product_Category_2, and Product_Category_2 is always greater than Product_Category_3.
 
-Again, this is an interesting pattern. It could mean something in the real business but we cannot uncover the meaning from the analysis. It is possible that the three categories are time-bounded features. For instance, product receipt time, vs. on-shelf time, vs. off-shelf time. If that is really the case, additional features may be built to help the models learn more patterns, for example: the latency between category_1 and category_2, or between category_2 and category_3. We can't find the real relationships among these features so have to assume they are not logically related.
+Again, this is an interesting pattern. It could mean something in the real business but we cannot uncover the meaning from the analysis. The three categories may be time-bounded features. For instance, product receipt time, vs. on-shelf time, vs. off-shelf time. If that is the case, additional features may be built to help the models learn more patterns, for example: the latency between category_1 and category_2, or between category_2 and category_3. We can't find the real relationships among these features so have to assume they are not logically related.
 
 <p float="left">
 <img src="./images/pc12.png" alt="drawing" width="391" style="border: 2px solid  gray;"/>
@@ -186,7 +186,7 @@ At this stage, we didn't find the data imbalance strongly linked to very differe
     
 Based on the above explorative data analysis, we decided on the following approach in feature engineering, with the code being explained in detail in the following chapter.
 
-1. Despite the fact that product_category_1, product_category_2, product_category_3, user_id, occupation, and marital_status are all numerical, they are more likely to be categorical features instead. In the following feature processing, we will treat all data features as categorical features. 
+1. even though product_category_1, product_category_2, product_category_3, user_id, occupation, and marital_status are all numerical, they are more likely to be categorical features instead. In the following feature processing, we will treat all data features as categorical features. 
 
 2. The product_category_2 and product_category_3 have quite a few missing values. Especially the product_category_3 has a very high missing value rate. Considering the triangular patterns between product_category_1 vs. product_category_2, and product_category_2 vs. product_category_3 we believe the missing values are on purpose. We will keep all the missing values and will deal with them in the data processing.
 
@@ -256,11 +256,11 @@ the X_train, y_train, and X_test as input parameters. It uses y_train and X_trai
 ####  Regressional Solutions
 **Note:** The following analysis can be found in the [02-Regression_Models.ipynb](html/02-Regression_Models.html).
     
-Based on the same preprocessed data features, we compared the performance of three regular regression models: Linear Regressor, XGB Regressor, and LightGB Regressor. We chose Linear Regressor as one of the baseline model because linear is a simple and stable model. Its learned parameters is easy to explain. We chose XGBoost and LightGB because both of them are proven very efficient model. Both of them are tree-based models. They are easy to train and they have built-in feature importance evaluation functions. 
+Based on the same preprocessed data features, we compared the performance of three regular regression models: Linear Regressor, XGB Regressor, and LightGB Regressor. We chose Linear Regressor as one of the baseline models because linear is a simple and stable model. Its learned parameters are easy to explain. We chose XGBoost and LightGB because both of them are proven very efficient models. Both of them are tree-based models. They are easy to train and they have built-in feature importance evaluation functions. 
 
-This case study is a prediction task. For prediction tasks, we are more interested in predicting the accurate mean values instead of median or other target values. There are two popular metrics for mean value prediction tasks: MSE and RMSE. We chose RMSE because it can maintain the scale of the error at the same level of the target values, so that the result is more intuitive. 
+This case study is a prediction task. For prediction tasks, we are more interested in predicting the accurate mean values instead of the median or other target values. There are two popular metrics for mean value prediction tasks: MSE and RMSE. We chose RMSE because it can maintain the scale of the error at the same level as the target values so that the result is more intuitive. 
 
-Because we down-scaled our training data during model training, we calculate two RMSE metrics: the first one was based on the down-scaled target value as the main metric, and the other was based on the original target values to make it easier to understand. 
+Because we down-scaled our training data during model training, we calculated two RMSE metrics: the first one was based on the down-scaled target value as the main metric, and the other was based on the original target values to make it easier to understand. 
 
 The code of the model training and their performance are as follows:
 
@@ -282,14 +282,14 @@ The feature importance chart of the XGB Regressor model is:
 
 <img src="./images/xgb_imp.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
-From the chart we can see that user_id and product_id were the top two strongest features. That justified our decision of including user_id and product_id by target_encoding. 
+From the chart, we can see that user_id and product_id were the top two strongest features. That justified our decision to include user_id and product_id by target_encoding. 
 
 ####  Recommendation Solutions
 **Note:** The following analysis can be found in the [03-Recommendation-FastAI.ipynb](html/03-Recommendation-FastAI.html) and [04-Recommendation-Surprise.ipynb](html/03-Recommendation-FastAI.html).
 
-In our regression model experiment, we have demonstrated that by utilising proper category encoding technique we can prodict more accurate result. This solution has it own limit. For category level with similar mean target values, the model has trouble to distinguish each other, therefor unable to uncover more accurate personal purchase predictions. In order to overcome this limitation, we have to use [recommendor system](https://en.wikipedia.org/wiki/Recommender_system) which was specialised on this purpose. 
+In our regression model experiment, we have demonstrated that by utilising proper category encoding techniques we can predict more accurate results. This solution has its limits. For category levels with similar mean target values, the model has trouble distinguishing each other and, therefore unable to uncover more accurate personal purchase predictions. To overcome this limitation, we have to use [recommendor system](https://en.wikipedia.org/wiki/Recommender_system) which was specialised for this purpose. 
 
-The recommender systems look at the challenge from a different angle. Typical recommender systems only learn patterns based on three data features: user, item, and rating. The modern recommender system was developed in a movie recommendation competition. Since then the feature names were inherited. And even the rating was inherited as in the range of [0.0, 10.0]. In our case the user is the user_id, item is product_id, and the rating is the transformed and downscalled purchase.  
+The recommender systems look at the challenge from a different angle. Typical recommender systems only learn patterns based on three data features: user, item, and rating. The modern recommender system was developed in a movie recommendation competition. Since then the feature names were inherited. And even the rating was inherited as in the range of [0.0, 10.0]. In our case the user is the user_id, the item is product_id, and the rating is the transformed and downscaled purchase.  
 
 There are different implementations of recommendation systems. For instance, [KNN](https://surprise.readthedocs.io/en/stable/knn_inspired.html), [Matrix Decomposition](https://surprise.readthedocs.io/en/stable/matrix_factorization.html), [Collaborative Filtering](https://surprise.readthedocs.io/en/stable/slope_one.html), and [DNN](https://docs.fast.ai/collab.html#create-a-learner). In this case study, we compared two technologies:
 
@@ -311,14 +311,14 @@ In the above SVD technology, the high-cardinal user and product features were de
 
 <img src="./images/DNN.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
-The FastAI framework did the category encoding behind the scene. It converts the input user_id and product_id into one-hot-encoded arrays before it passes the input to the DNN model. The model learned an embedding for each of the user_id and product_id input. The defualt embedding size for product_id was 157, and 207 for user_id. Above the embedding layer, there is a single fully connected middle layer, and top layer. It uses sigmoid as the final activation function and uses batch_normal and RELU in the middle layer. Optionally, it can trun on dropout to control overfitting. 
+The FastAI framework did the category encoding behind the scenes. It converts the input user_id and product_id into one-hot-encoded arrays before it passes the input to the DNN model. The model learned an embedding for each of the user_id and product_id inputs. The default embedding size for product_id was 157, and 207 for user_id. Above the embedding layer, there is a single fully connected middle layer and top layer. It uses sigmoid as the final activation function and uses batch_normal and RELU in the middle layer. Optionally, it can turn on dropout to control overfitting. 
 
 When running on the notebook, the deep learning model achieved a scaled RMSE of 0.8624, which is significantly better than the XGB Regressor.
 
 ### 3.2.3.6 Machine learning model training and development
 **Note:** The following analysis can be found in the [05-KFP_Pipeline.ipynb](html/05-KFP_Pipeline.html).
 
-The best-performing model is the DNN model trained using FastAI collab_learner. In order to control overfitting, the original data has been slipped into 75% as the train set and 25% as the test set. The model will be trained on the training set and evaluated using scaled RMSE and original RMSE on the test set. Unlike many other deep learning frameworks that use a fixed or decreasing learning rate, FastAI uses a cyclic learning rate to make the model training converge faster.
+The best-performing model is the DNN model trained using FastAI collab_learner. To control overfitting, the original data has been slipped into 75% as the train set and 25% as the test set. The model will be trained on the training set and evaluated using scaled RMSE and original RMSE on the test set. Unlike many other deep learning frameworks that use a fixed or decreasing learning rate, FastAI uses a cyclic learning rate to make the model training converge faster.
 
 We have a constraint to minimise the training cost; therefore, we didn't use a GPU. The DNN model training took 10 minutes to complete. To reduce the cost, we used a simplified version of grid search to optimise the DNN performance. We ran several experiments to select the best-performing model by changing the most important hyperparameter, n_factors, which is the size of the depth of the DNN fully connected layer. We found that the optimal number was 160.
 
@@ -351,7 +351,7 @@ A residual analysis has been done to spot whether there are any imbalanced error
 ### 3.2.3.8 Fairness analysis
 **Note:** The following analysis can be found in the [02-Regression_Models.ipynb](html/02-Regression_Models.html).
 
-The fairness analysis was based on the XGB Regressor model because the SVD and DNN models don't consider any demographic features and product category features. In order to evaluate the impact of including and excluding demographic features, we built a 'fair model' that is trained without demographic data features. The fair model achieves a scaled RMSE of 0.9005, which is lower than the same XGB model with demographic features.
+The fairness analysis was based on the XGB Regressor model because the SVD and DNN models don't consider any demographic features and product category features. To evaluate the impact of including and excluding demographic features, we built a 'fair model' that is trained without demographic data features. The fair model achieves a scaled RMSE of 0.9005, which is lower than the same XGB model with demographic features.
 
 <img src="./images/fr_code.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
@@ -387,7 +387,7 @@ As depicted above, the Vertex pipeline was composed of the whole process of the 
 6. train Pytorch DNN model and XGBoost model
 7. register the trained Pytorch DNN and XGBoost models
 8. create two endpoints
-9. deploy both the two models to their individual endpoint
+9. deploy both the two models to their endpoint
 
 The pipeline has been designed to be modifiable by changing parameters like random_seed, train-test split ratio, etc. Both the scaled RMSE and the original RMSE were published as the result of the model training. 
 
