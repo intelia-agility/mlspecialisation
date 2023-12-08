@@ -446,7 +446,10 @@ The second and final stage install the payload script:
         ENTRYPOINT gunicorn -b :5080 app:app --timeout 60
 
 The payload was:
->
+
+<img src="./images/docker.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
+
+The payload download the FastAI learner model file from GCS, then instantiate the learner. It serves predict and health-check requests on a flask webapp according to Vertex AI's custom prediction container spec. 
 
 ### 3.2.4.1 Model or application on Google Cloud
 - Vertex pipeline: https://console.cloud.google.com/vertex-ai/locations/us-central1/pipelines/runs/blackfriday-pipeline-v0-20231205035105?project=blackfridayintelia
@@ -462,6 +465,47 @@ The payload was:
     - XGB endpoint: blackfriday_xgb_endpoint
 
 <img src="./images/endpoints.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
+
+The XGB model and the DNN recommender require different type of input information for prediction. The XGB model requires all the 11 target_encoded features, while DNN recommender only needs the user_id and product_id features in string format. Both the two models produce scaled purchase prediction in the range of [0.0, 10.0]. 
+
+This is the sample request for the XGB model online prediction:
+
+        {
+          "instances": [
+            [
+              6.2101489131381715,
+              7.254104975790866,
+              5.981675992850174,
+              6.017937997965995,
+              5.700449875713969,
+              6.0722363637828956,
+              5.92934245345239,
+              5.9249683502366715,
+              7.430939226348394,
+              7.435290801926301,
+              6.80359933943496
+            ]
+          ]
+        }
+
+The model responded instantly with the prediction, and the meta-information of the model:
+
+<img src="./images/XGB_prediction.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
+
+The sample request for the DNN recommender online prediction is:
+
+        {
+          "instances": [
+            [
+              "1001062",
+              "P00351342"
+            ]
+          ]
+        }
+        
+The recommender model requires only the raw formated user_id and product_id. It produces the same format of result:
+
+<img src="./images/DNN_prediction.png" alt="drawing" width="800" style="border: 2px solid  gray;"/>
 
 ### 3.2.4.3 Editable Model or Application
 The best performant model is a PyTorch model, with two embedding inputs and one linear layer as the following:
