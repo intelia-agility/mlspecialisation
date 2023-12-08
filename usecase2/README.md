@@ -289,7 +289,7 @@ From the chart, we can see that user_id and product_id were the top two stronges
 
 In our regression model experiment, we have demonstrated that by utilising proper category encoding techniques we can predict more accurate results. This solution has its limits. For category levels with similar mean target values, the model has trouble distinguishing each other and, therefore unable to uncover more accurate personal purchase predictions. To overcome this limitation, we have to use [recommendor system](https://en.wikipedia.org/wiki/Recommender_system) which was specialised for this purpose. 
 
-The recommender systems look at the challenge from a different angle. Typical recommender systems only learn patterns based on three data features: user, item, and rating. The modern recommender system was developed in a movie recommendation competition. Since then the feature names were inherited. And even the rating was inherited as in the range of [0.0, 10.0]. In our case the user is the user_id, the item is product_id, and the rating is the transformed and downscaled purchase.  
+The recommender systems look at the challenge from a different angle. Typical recommender systems only learn patterns based on three data features: user, item, and rating. The modern recommender system was developed in a movie recommendation competition. Since then the feature names were inherited. And even the rating was inherited as in the range of [0.0, 10.0]. In our case the user is the user_id, the item is product_id, and the rating is the transformed and downscaled purchase. 
 
 There are different implementations of recommendation systems. For instance, [KNN](https://surprise.readthedocs.io/en/stable/knn_inspired.html), [Matrix Decomposition](https://surprise.readthedocs.io/en/stable/matrix_factorization.html), [Collaborative Filtering](https://surprise.readthedocs.io/en/stable/slope_one.html), and [DNN](https://docs.fast.ai/collab.html#create-a-learner). In this case study, we compared two technologies:
 
@@ -522,12 +522,14 @@ Model editing can be done by:
 ## Conclusion
 
 Compared to the most openly available Black Friday analysis, this case study produced higher performance. The lessons we learned from the case study were:
-1. Using target encoding to deal with high-dimensional categorical data features is a good idea.
-2. The user_id and product_id are generally considered low-importance features; however, with the help of proper business requirement analysis and the right solution, we can discover important patterns from the interactions between the user and product. The information was so rich that it outweighed the information in all other data features.
+1. Business goal understanding is pivotal in machine learning solution design. 
+2. Using target encoding to deal with high-dimensional categorical data features is a good idea. It can mitigate the high-dimension data problem for generic models.
+3. The user_id and product_id are generally considered low-importance features; however, with the help of proper business requirement analysis and the right solution, we can discover important patterns from the interactions between the user and product. The information was so rich that it outweighed the information in all other data features.
 
-The case study didn't go deeper to get the best performance because of time and budget constraints. Things to consider in further performance enhancement are:
+The case study didn't dive deep to get the best performance because of time and budget constraints. Things to consider in further performance enhancement are:
 1. Deep learning outperforms all other models. It only uses the user_id and product_id. It is worth including the embedding of other features
 2. The DNN model only has one fully connected layer. Probably, performance can increase with a more sophisticated model
+3. The best performing recomender system has a inherent limitation: all the user and item must pre-exist in the training data, and there must be at least certain level interactions in history. Otherwise, the model can't find any pattern. This is called cold-start problem because the solution can't deal with new user and new item. We didn't touch how to solve the cold-start problem in this case study. The general solution is to use two models so that when the user and item are new to the system, the solution falls back to general prediction model.  
 
 
 ## Resources
