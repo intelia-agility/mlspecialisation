@@ -54,7 +54,22 @@ The original Black Friday Sales Prediction dataset has two data files in CSV for
 - BigQuery training data table: blackfridayintelia.blackfriday.blackfriday for the original train.csv
 - BigQuery testing data table: blackfridayintelia.blackfriday.blackfriday_test for the original test.csv
 
-## Compliance with Google Machine Learning Best Practice Guidline
+### Compliance with Google ML best practices
+
+EDA
+Aligned with the MLBP guidline, we ran all EDA on Vertex Workbench user-managed notebook instance.
+
+ML Environment
+Our solution was based on Vertex AI solutions. It was programmed using Vertex SDK for Python, trained using Vertex Pipeline, the model was registered in Vertex, and deployed by Vertex online prediction endpoint. 
+
+Hyperparameter Tuning
+For the two models, we employed hyperparameter tuning process to achieve the optimal model performance. We use sklearn hyperparameter function to tune our XGBoost model and developed a RandomSearch function for tuning the FastAI DNN model. This is in line with Google Cloud's best practices for developing robust and high-performing machine learning models.
+
+Training Efficiency Tools
+We chose FastAI for our DNN Recommender model training. FastAI is well known for its efficient training process that uses cyclar learning rate to achieve the best converge speed. 
+
+Data Collection and Storage in Google Cloud
+As part of our commitment to following best practices, we store the raw input data as CSV in the GCS, and store the data in BigQuery to faciliate data analysis.
 
 ## 3.2.3 Solution
 ### 3.2.3.1 Business goal and machine learning solution
