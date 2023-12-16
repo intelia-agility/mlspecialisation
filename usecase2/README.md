@@ -16,6 +16,7 @@ Despite the popularity of the Kaggle Black Friday Prediction dataset, many open 
     - [3.2.1.2 Code origin certification](#3212-code-origin-certification)
 - [3.2.2 Data](#322-data)
     - [3.2.2.1 Dataset in Google Cloud](#3221-dataset-in-google-cloud)
+- [Compliance with Google ML best practices](#Compliance-with-Google-ML-best-practices)
 - [3.2.3 Solution](#323-solution)
     - [3.2.3.1 Business goal and machine learning solution](#3231-business-goal-and-machine-learning-solution)
     - [3.2.3.2 Data exploration](#3232-data-exploration)
@@ -31,10 +32,10 @@ Despite the popularity of the Kaggle Black Friday Prediction dataset, many open 
     - [3.2.4.1 Model/ application on Google Cloud](#3241-Model-or-application-on-Google-Cloud)
     - [3.2.4.2 Callable library/ application](#3242-Callable-library-or-application)
     - [3.2.4.3 Editable Model/ application](#3243-Editable-Model-or-application)
-
 - [Conclusion](#Conclusion)
 - [Resources](#Resources)
     - [Evaluation Criteria](#Evaluation-Criteria)
+    - [Google ML best practices](#Google-ML-best-practices)
     - [Recommender System](#Recommender-System)
 
 ## 3.2.1 Code
@@ -52,6 +53,8 @@ The original Black Friday Sales Prediction dataset has two data files in CSV for
 - Data source: gs://blackfriday_data/train.csv
 - BigQuery training data table: blackfridayintelia.blackfriday.blackfriday for the original train.csv
 - BigQuery testing data table: blackfridayintelia.blackfriday.blackfriday_test for the original test.csv
+
+## Compliance with Google Machine Learning Best Practice Guidline
 
 ## 3.2.3 Solution
 ### 3.2.3.1 Business goal and machine learning solution
@@ -552,6 +555,9 @@ The case study didn't dive deep to get the best performance because of time and 
 |  |     3.2.4.2 Callable library/ application    | Partners must demonstrate that the machine learning model for demo #2 is a callable library and/or application.   <br><br> Evidence must include a demonstration of how the served model can be used to make a prediction via an API call.  |
 |  |     3.2.4.3 Editable Model/ application  | Partners must demonstrate that the deployed machine learning model is customizable.   <br><br> Evidence must include a demonstration that the deployed model is fully functional after an appropriate code modification, as might be performed by a customer.    |
 
+### Google ML best practices
+    https://cloud.google.com/architecture/ml-on-gcp-best-practices#use-vertex-feature-store-with-structured-data
+    
 ### Recommender System
     https://en.wikipedia.org/wiki/Recommender_system
     https://surprise.readthedocs.io/en/stable/knn_inspired.html
