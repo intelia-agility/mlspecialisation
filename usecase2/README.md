@@ -16,7 +16,7 @@ Despite the popularity of the Kaggle Black Friday Prediction dataset, many open 
     - [3.2.1.2 Code origin certification](#3212-code-origin-certification)
 - [3.2.2 Data](#322-data)
     - [3.2.2.1 Dataset in Google Cloud](#3221-dataset-in-google-cloud)
-- [Compliance with Google ML best practices](#Compliance-with-Google-ML-best-practices)
+- [Compliance with Google ML best practices](#compliance-with-google-ml-best-practices)
 - [3.2.3 Solution](#323-solution)
     - [3.2.3.1 Business goal and machine learning solution](#3231-business-goal-and-machine-learning-solution)
     - [3.2.3.2 Data exploration](#3232-data-exploration)
@@ -35,7 +35,7 @@ Despite the popularity of the Kaggle Black Friday Prediction dataset, many open 
 - [Conclusion](#Conclusion)
 - [Resources](#Resources)
     - [Evaluation Criteria](#Evaluation-Criteria)
-    - [Google ML best practices](#Google-ML-best-practices)
+    - [Google ML best practices](#google-ml-best-practices)
     - [Recommender System](#Recommender-System)
 
 ## 3.2.1 Code
